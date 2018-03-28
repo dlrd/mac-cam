@@ -7,10 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2FC9301E139D85A500DA0D4F /* AVCaptureDeviceFormat_AVRecorderAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FC9301D139D85A500DA0D4F /* AVCaptureDeviceFormat_AVRecorderAdditions.m */; };
+		2FC9301E139D85A500DA0D4F /* utilities.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2FC9301D139D85A500DA0D4F /* utilities.mm */; };
 		2FC93021139D875D00DA0D4F /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FC93020139D875D00DA0D4F /* CoreMedia.framework */; };
 		2FC93025139D8CC500DA0D4F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FC93024139D8CC500DA0D4F /* AudioToolbox.framework */; };
-		2FC93049139D988300DA0D4F /* AVFrameRateRange_AVRecorderAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FC93048139D988300DA0D4F /* AVFrameRateRange_AVRecorderAdditions.m */; };
 		E9C967D3137B516200C6D18B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C967D2137B516200C6D18B /* Cocoa.framework */; };
 		E9C967DD137B516200C6D18B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E9C967DB137B516200C6D18B /* InfoPlist.strings */; };
 		E9C967DF137B516200C6D18B /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = E9C967DE137B516200C6D18B /* main.mm */; };
@@ -21,12 +20,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2FC9301C139D85A500DA0D4F /* AVCaptureDeviceFormat_AVRecorderAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVCaptureDeviceFormat_AVRecorderAdditions.h; sourceTree = "<group>"; };
-		2FC9301D139D85A500DA0D4F /* AVCaptureDeviceFormat_AVRecorderAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVCaptureDeviceFormat_AVRecorderAdditions.m; sourceTree = "<group>"; };
+		2FC9301C139D85A500DA0D4F /* utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utilities.h; sourceTree = "<group>"; };
+		2FC9301D139D85A500DA0D4F /* utilities.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = utilities.mm; sourceTree = "<group>"; };
 		2FC93020139D875D00DA0D4F /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		2FC93024139D8CC500DA0D4F /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		2FC93047139D988300DA0D4F /* AVFrameRateRange_AVRecorderAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVFrameRateRange_AVRecorderAdditions.h; sourceTree = "<group>"; };
-		2FC93048139D988300DA0D4F /* AVFrameRateRange_AVRecorderAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVFrameRateRange_AVRecorderAdditions.m; sourceTree = "<group>"; };
 		E9C967CE137B516200C6D18B /* mac-cam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mac-cam.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9C967D2137B516200C6D18B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E9C967DA137B516200C6D18B /* mac-cam-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "mac-cam-info.plist"; sourceTree = "<group>"; };
@@ -60,10 +57,8 @@
 			children = (
 				E9C967E4137B516200C6D18B /* mac-cam.h */,
 				E9C967E5137B516200C6D18B /* mac-cam.mm */,
-				2FC9301C139D85A500DA0D4F /* AVCaptureDeviceFormat_AVRecorderAdditions.h */,
-				2FC9301D139D85A500DA0D4F /* AVCaptureDeviceFormat_AVRecorderAdditions.m */,
-				2FC93047139D988300DA0D4F /* AVFrameRateRange_AVRecorderAdditions.h */,
-				2FC93048139D988300DA0D4F /* AVFrameRateRange_AVRecorderAdditions.m */,
+				2FC9301C139D85A500DA0D4F /* utilities.h */,
+				2FC9301D139D85A500DA0D4F /* utilities.mm */,
 				E9C967DE137B516200C6D18B /* main.mm */,
 				E9C967E0137B516200C6D18B /* mac-cam-prefix.pch */,
 				E9C967DA137B516200C6D18B /* mac-cam-info.plist */,
@@ -159,8 +154,7 @@
 			files = (
 				E9C967DF137B516200C6D18B /* main.mm in Sources */,
 				E9C967E6137B516200C6D18B /* mac-cam.mm in Sources */,
-				2FC9301E139D85A500DA0D4F /* AVCaptureDeviceFormat_AVRecorderAdditions.m in Sources */,
-				2FC93049139D988300DA0D4F /* AVFrameRateRange_AVRecorderAdditions.m in Sources */,
+				2FC9301E139D85A500DA0D4F /* utilities.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

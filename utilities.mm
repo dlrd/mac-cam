@@ -1,4 +1,4 @@
-#import "AVCaptureDeviceFormat_AVRecorderAdditions.h"
+#import "utilities.h"
 
 @implementation AVCaptureDeviceFormat (AVRecorderAdditions)
 
@@ -12,7 +12,7 @@
 	{
 		case kCMMediaType_Video:
 		{
-			CFStringRef formatName = CMFormatDescriptionGetExtension([self formatDescription], kCMFormatDescriptionExtension_FormatName);
+			CFStringRef formatName = (CFStringRef) CMFormatDescriptionGetExtension([self formatDescription], kCMFormatDescriptionExtension_FormatName);
 			CMVideoDimensions dimensions = CMVideoFormatDescriptionGetDimensions((CMVideoFormatDescriptionRef)[self formatDescription]);
 			localizedName = [NSString stringWithFormat:@"%@, %d x %d", formatName, dimensions.width, dimensions.height];
 		}
@@ -50,7 +50,7 @@
 				AudioFormatGetProperty(kAudioFormatProperty_FormatName, (UInt32)sizeof(modifiedASBD), &modifiedASBD, &propertyDataSize, &formatName);
 				if (!formatName)
 				{
-					formatName = CMFormatDescriptionGetExtension([self formatDescription], kCMFormatDescriptionExtension_FormatName);
+					formatName = (CFStringRef) CMFormatDescriptionGetExtension([self formatDescription], kCMFormatDescriptionExtension_FormatName);
 					if (formatName)
 						CFRetain(formatName);
 				}
@@ -79,6 +79,20 @@
 	}
 	
 	return localizedName;
+}
+
+@end
+
+@implementation AVFrameRateRange (AVRecorderAdditions)
+
+- (NSString *)localizedName
+{
+    if ([self minFrameRate] != [self maxFrameRate]) {
+        NSString *formatString = NSLocalizedString(@"FPS: %0.2f-%0.2f", @"FPS when minFrameRate != maxFrameRate");
+        return [NSString stringWithFormat:formatString, [self minFrameRate], [self maxFrameRate]];
+    }
+    NSString *formatString = NSLocalizedString(@"FPS: %0.2f", @"FPS when minFrameRate == maxFrameRate");
+    return [NSString stringWithFormat:formatString, [self minFrameRate]];
 }
 
 @end
