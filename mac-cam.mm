@@ -45,7 +45,7 @@
  
  */
 
-#import "AVRecorderDocument.h"
+#import "mac-cam.h"
 #import <AVFoundation/AVFoundation.h>
 
 @interface AVRecorderDocument () <AVCaptureFileOutputDelegate, AVCaptureFileOutputRecordingDelegate>
@@ -182,7 +182,7 @@
 
 - (NSString *)windowNibName
 {
-	return @"AVRecorderDocument";
+	return @"MainWindow";
 }
 
 - (void)windowControllerDidLoadNib:(NSWindowController *) aController

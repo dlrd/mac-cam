@@ -7,36 +7,35 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2FC9301E139D85A500DA0D4F /* AVCaptureDeviceFormat_mac-camAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FC9301D139D85A500DA0D4F /* AVCaptureDeviceFormat_mac-camAdditions.m */; };
+		2FC9301E139D85A500DA0D4F /* AVCaptureDeviceFormat_AVRecorderAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FC9301D139D85A500DA0D4F /* AVCaptureDeviceFormat_AVRecorderAdditions.m */; };
 		2FC93021139D875D00DA0D4F /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FC93020139D875D00DA0D4F /* CoreMedia.framework */; };
 		2FC93025139D8CC500DA0D4F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FC93024139D8CC500DA0D4F /* AudioToolbox.framework */; };
-		2FC93049139D988300DA0D4F /* AVFrameRateRange_mac-camAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FC93048139D988300DA0D4F /* AVFrameRateRange_mac-camAdditions.m */; };
+		2FC93049139D988300DA0D4F /* AVFrameRateRange_AVRecorderAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FC93048139D988300DA0D4F /* AVFrameRateRange_AVRecorderAdditions.m */; };
 		E9C967D3137B516200C6D18B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C967D2137B516200C6D18B /* Cocoa.framework */; };
 		E9C967DD137B516200C6D18B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E9C967DB137B516200C6D18B /* InfoPlist.strings */; };
-		E9C967DF137B516200C6D18B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E9C967DE137B516200C6D18B /* main.m */; };
+		E9C967DF137B516200C6D18B /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = E9C967DE137B516200C6D18B /* main.mm */; };
 		E9C967E6137B516200C6D18B /* mac-cam.mm in Sources */ = {isa = PBXBuildFile; fileRef = E9C967E5137B516200C6D18B /* mac-cam.mm */; };
-		E9C967E9137B516200C6D18B /* App.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9C967E7137B516200C6D18B /* App.xib */; };
+		E9C967E9137B516200C6D18B /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9C967E7137B516200C6D18B /* MainWindow.xib */; };
 		E9C967EC137B516200C6D18B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9C967EA137B516200C6D18B /* MainMenu.xib */; };
 		E9C967F8137B51A700C6D18B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C967F7137B51A700C6D18B /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		28CF708F1667DCB20091B82E /* Read Me.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Read Me.txt"; sourceTree = "<group>"; };
-		2FC9301C139D85A500DA0D4F /* AVCaptureDeviceFormat_mac-camAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVCaptureDeviceFormat_mac-camAdditions.h; sourceTree = "<group>"; };
-		2FC9301D139D85A500DA0D4F /* AVCaptureDeviceFormat_mac-camAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVCaptureDeviceFormat_mac-camAdditions.m; sourceTree = "<group>"; };
+		2FC9301C139D85A500DA0D4F /* AVCaptureDeviceFormat_AVRecorderAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVCaptureDeviceFormat_AVRecorderAdditions.h; sourceTree = "<group>"; };
+		2FC9301D139D85A500DA0D4F /* AVCaptureDeviceFormat_AVRecorderAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVCaptureDeviceFormat_AVRecorderAdditions.m; sourceTree = "<group>"; };
 		2FC93020139D875D00DA0D4F /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		2FC93024139D8CC500DA0D4F /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		2FC93047139D988300DA0D4F /* AVFrameRateRange_mac-camAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVFrameRateRange_mac-camAdditions.h; sourceTree = "<group>"; };
-		2FC93048139D988300DA0D4F /* AVFrameRateRange_mac-camAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVFrameRateRange_mac-camAdditions.m; sourceTree = "<group>"; };
-		E9C967CE137B516200C6D18B /* mac-cam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mac-cam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2FC93047139D988300DA0D4F /* AVFrameRateRange_AVRecorderAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVFrameRateRange_AVRecorderAdditions.h; sourceTree = "<group>"; };
+		2FC93048139D988300DA0D4F /* AVFrameRateRange_AVRecorderAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVFrameRateRange_AVRecorderAdditions.m; sourceTree = "<group>"; };
+		E9C967CE137B516200C6D18B /* mac-cam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mac-cam.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9C967D2137B516200C6D18B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E9C967DA137B516200C6D18B /* mac-cam-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "mac-cam-info.plist"; sourceTree = "<group>"; };
 		E9C967DC137B516200C6D18B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		E9C967DE137B516200C6D18B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		E9C967DE137B516200C6D18B /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		E9C967E0137B516200C6D18B /* mac-cam-prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "mac-cam-prefix.pch"; sourceTree = "<group>"; };
-		E9C967E4137B516200C6D18B /* mac-camDocument.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mac-camDocument.h; sourceTree = "<group>"; };
-		E9C967E5137B516200C6D18B /* mac-cam.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = mac-cam.mm; sourceTree = "<group>"; };
-		E9C967E8137B516200C6D18B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/App.xib; sourceTree = "<group>"; };
+		E9C967E4137B516200C6D18B /* mac-cam.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "mac-cam.h"; sourceTree = "<group>"; };
+		E9C967E5137B516200C6D18B /* mac-cam.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "mac-cam.mm"; sourceTree = "<group>"; };
+		E9C967E8137B516200C6D18B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
 		E9C967EB137B516200C6D18B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		E9C967F7137B51A700C6D18B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -59,8 +58,18 @@
 		E9C967C3137B516100C6D18B = {
 			isa = PBXGroup;
 			children = (
-				28CF708F1667DCB20091B82E /* Read Me.txt */,
-				E9C967D8137B516200C6D18B /* mac-cam */,
+				E9C967E4137B516200C6D18B /* mac-cam.h */,
+				E9C967E5137B516200C6D18B /* mac-cam.mm */,
+				2FC9301C139D85A500DA0D4F /* AVCaptureDeviceFormat_AVRecorderAdditions.h */,
+				2FC9301D139D85A500DA0D4F /* AVCaptureDeviceFormat_AVRecorderAdditions.m */,
+				2FC93047139D988300DA0D4F /* AVFrameRateRange_AVRecorderAdditions.h */,
+				2FC93048139D988300DA0D4F /* AVFrameRateRange_AVRecorderAdditions.m */,
+				E9C967DE137B516200C6D18B /* main.mm */,
+				E9C967E0137B516200C6D18B /* mac-cam-prefix.pch */,
+				E9C967DA137B516200C6D18B /* mac-cam-info.plist */,
+				E9C967E7137B516200C6D18B /* MainWindow.xib */,
+				E9C967EA137B516200C6D18B /* MainMenu.xib */,
+				E9C967DB137B516200C6D18B /* InfoPlist.strings */,
 				E9C967D1137B516200C6D18B /* Frameworks */,
 				E9C967CF137B516200C6D18B /* Products */,
 			);
@@ -85,33 +94,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		E9C967D8137B516200C6D18B /* mac-cam */ = {
-			isa = PBXGroup;
-			children = (
-				E9C967E4137B516200C6D18B /* mac-camDocument.h */,
-				E9C967E5137B516200C6D18B /* mac-cam.mm */,
-				2FC9301C139D85A500DA0D4F /* AVCaptureDeviceFormat_mac-camAdditions.h */,
-				2FC9301D139D85A500DA0D4F /* AVCaptureDeviceFormat_mac-camAdditions.m */,
-				2FC93047139D988300DA0D4F /* AVFrameRateRange_mac-camAdditions.h */,
-				2FC93048139D988300DA0D4F /* AVFrameRateRange_mac-camAdditions.m */,
-				E9C967E7137B516200C6D18B /* App.xib */,
-				E9C967EA137B516200C6D18B /* MainMenu.xib */,
-				E9C967D9137B516200C6D18B /* Supporting Files */,
-			);
-			path = mac-cam;
-			sourceTree = "<group>";
-		};
-		E9C967D9137B516200C6D18B /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				E9C967DA137B516200C6D18B /* mac-cam-info.plist */,
-				E9C967DB137B516200C6D18B /* InfoPlist.strings */,
-				E9C967DE137B516200C6D18B /* main.m */,
-				E9C967E0137B516200C6D18B /* mac-cam-prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -127,8 +109,8 @@
 			);
 			dependencies = (
 			);
-			name = mac-cam;
-			productName = mac-cam;
+			name = "mac-cam";
+			productName = "mac-cam";
 			productReference = E9C967CE137B516200C6D18B /* mac-cam.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -163,7 +145,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9C967DD137B516200C6D18B /* InfoPlist.strings in Resources */,
-				E9C967E9137B516200C6D18B /* App.xib in Resources */,
+				E9C967E9137B516200C6D18B /* MainWindow.xib in Resources */,
 				E9C967EC137B516200C6D18B /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -175,10 +157,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E9C967DF137B516200C6D18B /* main.m in Sources */,
+				E9C967DF137B516200C6D18B /* main.mm in Sources */,
 				E9C967E6137B516200C6D18B /* mac-cam.mm in Sources */,
-				2FC9301E139D85A500DA0D4F /* AVCaptureDeviceFormat_mac-camAdditions.m in Sources */,
-				2FC93049139D988300DA0D4F /* AVFrameRateRange_mac-camAdditions.m in Sources */,
+				2FC9301E139D85A500DA0D4F /* AVCaptureDeviceFormat_AVRecorderAdditions.m in Sources */,
+				2FC93049139D988300DA0D4F /* AVFrameRateRange_AVRecorderAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -193,12 +175,12 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		E9C967E7137B516200C6D18B /* App.xib */ = {
+		E9C967E7137B516200C6D18B /* MainWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				E9C967E8137B516200C6D18B /* en */,
 			);
-			name = App.xib;
+			name = MainWindow.xib;
 			sourceTree = "<group>";
 		};
 		E9C967EA137B516200C6D18B /* MainMenu.xib */ = {
@@ -207,7 +189,7 @@
 				E9C967EB137B516200C6D18B /* en */,
 			);
 			name = MainMenu.xib;
-			sourceTree = "<group>";
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXVariantGroup section */
 
@@ -275,6 +257,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "mac-cam-prefix.pch";
 				INFOPLIST_FILE = "mac-cam-info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "mac-cam";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -287,6 +270,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "mac-cam-prefix.pch";
 				INFOPLIST_FILE = "mac-cam-info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "mac-cam";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

@@ -26,11 +26,11 @@
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>AVRecorder</string>
+	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIdentifier</key>
-	<string>Apple-Inc.AVRecorder</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
