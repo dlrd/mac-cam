@@ -12,7 +12,7 @@
 @class AVCaptureDeviceFormat;
 @class AVFrameRateRange;
 @class AVCaptureVideoDataOutput;
-@class OpenGLTextureView;
+@class OpenGLCamView;
 
 @interface AVRecorderDocument : NSDocument
 {
@@ -58,7 +58,7 @@
 @property (assign) IBOutlet NSView *previewView;
 @property (assign) float previewVolume;
 @property (assign) IBOutlet NSLevelIndicator *audioLevelMeter;
-@property (assign) IBOutlet OpenGLTextureView *glTextureView;
+@property (assign) IBOutlet OpenGLCamView *glCamView;
 
 #pragma mark - Transport Controls
 @property (readonly,getter=isPlaying) BOOL playing;

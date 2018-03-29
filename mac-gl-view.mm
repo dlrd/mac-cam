@@ -1,5 +1,7 @@
 #import "mac-gl-view.h"
 #import "gl-renderer.h"
+#import "gl-test-renderer.h"
+#import "gl-cam-renderer.h"
 #import <QuartzCore/CVDisplayLink.h>
 
 #define SUPPORT_RETINA_RESOLUTION 1
@@ -9,7 +11,7 @@
     CVDisplayLinkRef displayLink;
     CVTimeStamp      lastFrameTime;
 
-    id<OpenGLRenderer> _renderer;
+    GLRenderer* _renderer;
 }
 @end
 
@@ -42,7 +44,7 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink,
 
     self_->lastFrameTime = *outputTime;
 
-    CVReturn result = [self_->_renderer renderForTime:self_->lastFrameTime];
+    CVReturn result = self_->_renderer->renderForTime(self_->lastFrameTime);
 
     CGLFlushDrawable([self_.openGLContext CGLContextObj]);
 
@@ -188,8 +190,7 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink,
 #endif // !SUPPORT_RETINA_RESOLUTION
     
 	// Set the new dimensions in our renderer
-	[_renderer resizeWithWidth:viewRectPixels.size.width
-                      AndHeight:viewRectPixels.size.height];
+	_renderer->resize(viewRectPixels.size.width, viewRectPixels.size.height);
 	
 	CGLUnlockContext([[self openGLContext] CGLContextObj]);
 }
@@ -227,7 +228,7 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	// simultaneously when resizing
 	CGLLockContext([[self openGLContext] CGLContextObj]);
 
-	[_renderer renderForTime:lastFrameTime];
+	_renderer->renderForTime(lastFrameTime);
 
 	CGLFlushDrawable([[self openGLContext] CGLContextObj]);
 	CGLUnlockContext([[self openGLContext] CGLContextObj]);
@@ -242,17 +243,49 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink,
 
 	CVDisplayLinkRelease(displayLink);
 
+    delete _renderer;
+
     [super dealloc];
 }
 @end
 
-#import "gl-texture-renderer.h"
+#import "gl-test-renderer.h"
 
-@implementation OpenGLTextureView
-
-- (id<OpenGLRenderer>) createRendererWithDefaultFBO: (GLuint)fbo
+@implementation OpenGLTestView
 {
-    return [[OpenGLTextureRenderer alloc ] initWithDefaultFBO:fbo];
+    GLTestRenderer* _renderer;
+}
+
+- (GLRenderer*) createRendererWithDefaultFBO: (GLuint)fbo;
+{
+    _renderer = new GLTestRenderer();
+    _renderer->initWithDefaultFBO(fbo);
+    return _renderer;
 }
 
 @end
+
+@implementation OpenGLCamView
+{
+    GLCamRenderer* _renderer;
+}
+
+- (unsigned)textureName
+{
+    return _renderer->textureName;
+}
+
+- (void)setTextureName:(unsigned)textureName
+{
+    _renderer->textureName = textureName;
+}
+
+- (GLRenderer*) createRendererWithDefaultFBO: (GLuint)fbo;
+{
+    _renderer = new GLCamRenderer();
+    _renderer->initWithDefaultFBO(fbo);
+    return _renderer;
+}
+
+@end
+

@@ -5,11 +5,17 @@
 
 @interface OpenGLView : NSOpenGLView
 
-- (id<OpenGLRenderer>) createRendererWithDefaultFBO: (GLuint)fbo;
+- (GLRenderer*) createRendererWithDefaultFBO: (GLuint)fbo;
 
 @end
 
 // FIXME: Wrong spot.
-@interface OpenGLTextureView : OpenGLView
+@interface OpenGLTestView : OpenGLView
+@end
+
+// FIXME: Wrong spot.
+@interface OpenGLCamView : OpenGLView
+
+@property (nonatomic) unsigned textureName;
 
 @end

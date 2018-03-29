@@ -260,7 +260,7 @@ IA
                             <action selector="lockVideoDeviceForConfiguration:" target="-2" id="100479"/>
                         </connections>
                     </button>
-                    <customView canDrawConcurrently="YES" misplaced="YES" id="TPz-mc-moz" customClass="OpenGLTextureView">
+                    <customView canDrawConcurrently="YES" misplaced="YES" id="TPz-mc-moz" customClass="OpenGLCamView">
                         <rect key="frame" x="319" y="45" width="321" height="403"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" heightSizable="YES"/>
                     </customView>

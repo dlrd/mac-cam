@@ -1,6 +1,7 @@
 #import "mac-cam.h"
 #import <AVFoundation/AVFoundation.h>
 #import <OpenGL/OpenGL.h>
+#import "mac-gl-view.h"
 
 @interface AVRecorderDocument () <AVCaptureFileOutputDelegate, AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>
 
@@ -611,6 +612,8 @@
     NSLog(@"%@", pixelBuffer);
 
     GLuint textureName = CVOpenGLTextureGetName(pixelBuffer);
+    
+    self.glCamView.textureName = textureName;
 }
 
 - (void)captureOutput:(AVCaptureOutput *)output didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection NS_AVAILABLE(10_7, 6_0);
