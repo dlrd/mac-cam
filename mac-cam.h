@@ -1,3 +1,5 @@
+#pragma once
+
 #import <Cocoa/Cocoa.h>
 
 @class AVCaptureVideoPreviewLayer;
@@ -9,6 +11,8 @@
 @class AVCaptureDevice;
 @class AVCaptureDeviceFormat;
 @class AVFrameRateRange;
+@class AVCaptureVideoDataOutput;
+@class OpenGLTextureView;
 
 @interface AVRecorderDocument : NSDocument
 {
@@ -22,6 +26,7 @@
 	AVCaptureDeviceInput		*audioDeviceInput;
 	AVCaptureMovieFileOutput	*movieFileOutput;
 	AVCaptureAudioPreviewOutput	*audioPreviewOutput;
+    AVCaptureVideoDataOutput    *videoOutput;
 	
 	NSArray						*videoDevices;
 	NSArray						*audioDevices;
@@ -53,6 +58,7 @@
 @property (assign) IBOutlet NSView *previewView;
 @property (assign) float previewVolume;
 @property (assign) IBOutlet NSLevelIndicator *audioLevelMeter;
+@property (assign) IBOutlet OpenGLTextureView *glTextureView;
 
 #pragma mark - Transport Controls
 @property (readonly,getter=isPlaying) BOOL playing;

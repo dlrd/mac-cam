@@ -1,4 +1,25 @@
 #import "utilities.h"
+#include <mach/mach.h>
+#include <mach/mach_time.h>
+#include <unistd.h>
+#include <cassert>
+
+static uint64_t program_startup_time = mach_absolute_time();
+
+double toSeconds (uint64_t mach_host_time)
+{
+    static mach_timebase_info_data_t info;
+
+    if (info.denom == 0)
+        mach_timebase_info(&info);
+
+    return (double(mach_host_time) * double(info.numer)) / double(info.denom) / 1e9;
+}
+
+double toHostSeconds (CVTimeStamp t)
+{
+    return toSeconds(t.hostTime - program_startup_time);
+}
 
 @implementation AVCaptureDeviceFormat (AVRecorderAdditions)
 

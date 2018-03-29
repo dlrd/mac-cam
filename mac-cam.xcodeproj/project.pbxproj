@@ -10,12 +10,18 @@
 		2FC9301E139D85A500DA0D4F /* utilities.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2FC9301D139D85A500DA0D4F /* utilities.mm */; };
 		2FC93021139D875D00DA0D4F /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FC93020139D875D00DA0D4F /* CoreMedia.framework */; };
 		2FC93025139D8CC500DA0D4F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FC93024139D8CC500DA0D4F /* AudioToolbox.framework */; };
+		6F2F32AB206BDB4400BA10DA /* gl-texture-renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6F2F32AA206BDB4400BA10DA /* gl-texture-renderer.mm */; };
+		6F2F32AD206BDC3C00BA10DA /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F2F32AC206BDC3C00BA10DA /* OpenGL.framework */; };
+		6F2F32B0206BE2F000BA10DA /* shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 6F2F32AE206BE2EF00BA10DA /* shader.fsh */; };
+		6F2F32B1206BE2F000BA10DA /* shader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 6F2F32AF206BE2EF00BA10DA /* shader.vsh */; };
+		6F2F32B4206BF40500BA10DA /* mac-gl-view.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6F2F32B2206BF40500BA10DA /* mac-gl-view.mm */; };
+		6FCCD49E206BD6070039903F /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FCCD49D206BD6070039903F /* CoreVideo.framework */; };
 		E9C967D3137B516200C6D18B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C967D2137B516200C6D18B /* Cocoa.framework */; };
 		E9C967DD137B516200C6D18B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E9C967DB137B516200C6D18B /* InfoPlist.strings */; };
 		E9C967DF137B516200C6D18B /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = E9C967DE137B516200C6D18B /* main.mm */; };
 		E9C967E6137B516200C6D18B /* mac-cam.mm in Sources */ = {isa = PBXBuildFile; fileRef = E9C967E5137B516200C6D18B /* mac-cam.mm */; };
-		E9C967E9137B516200C6D18B /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9C967E7137B516200C6D18B /* MainWindow.xib */; };
-		E9C967EC137B516200C6D18B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9C967EA137B516200C6D18B /* MainMenu.xib */; };
+		E9C967E9137B516200C6D18B /* window.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9C967E7137B516200C6D18B /* window.xib */; };
+		E9C967EC137B516200C6D18B /* menu.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9C967EA137B516200C6D18B /* menu.xib */; };
 		E9C967F8137B51A700C6D18B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C967F7137B51A700C6D18B /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
@@ -24,6 +30,15 @@
 		2FC9301D139D85A500DA0D4F /* utilities.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = utilities.mm; sourceTree = "<group>"; };
 		2FC93020139D875D00DA0D4F /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		2FC93024139D8CC500DA0D4F /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		6F2F32A9206BDB4400BA10DA /* gl-texture-renderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "gl-texture-renderer.h"; sourceTree = "<group>"; };
+		6F2F32AA206BDB4400BA10DA /* gl-texture-renderer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "gl-texture-renderer.mm"; sourceTree = "<group>"; };
+		6F2F32AC206BDC3C00BA10DA /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		6F2F32AE206BE2EF00BA10DA /* shader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader.fsh; sourceTree = "<group>"; };
+		6F2F32AF206BE2EF00BA10DA /* shader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader.vsh; sourceTree = "<group>"; };
+		6F2F32B2206BF40500BA10DA /* mac-gl-view.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "mac-gl-view.mm"; sourceTree = "<group>"; };
+		6F2F32B3206BF40500BA10DA /* mac-gl-view.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mac-gl-view.h"; sourceTree = "<group>"; };
+		6F2F32B5206BF4B800BA10DA /* gl-renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "gl-renderer.h"; sourceTree = "<group>"; };
+		6FCCD49D206BD6070039903F /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		E9C967CE137B516200C6D18B /* mac-cam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mac-cam.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9C967D2137B516200C6D18B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E9C967DA137B516200C6D18B /* mac-cam-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "mac-cam-info.plist"; sourceTree = "<group>"; };
@@ -32,8 +47,8 @@
 		E9C967E0137B516200C6D18B /* mac-cam-prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "mac-cam-prefix.pch"; sourceTree = "<group>"; };
 		E9C967E4137B516200C6D18B /* mac-cam.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "mac-cam.h"; sourceTree = "<group>"; };
 		E9C967E5137B516200C6D18B /* mac-cam.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "mac-cam.mm"; sourceTree = "<group>"; };
-		E9C967E8137B516200C6D18B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
-		E9C967EB137B516200C6D18B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		E9C967E8137B516200C6D18B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/window.xib; sourceTree = "<group>"; };
+		E9C967EB137B516200C6D18B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/menu.xib; sourceTree = "<group>"; };
 		E9C967F7137B51A700C6D18B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -42,6 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F2F32AD206BDC3C00BA10DA /* OpenGL.framework in Frameworks */,
+				6FCCD49E206BD6070039903F /* CoreVideo.framework in Frameworks */,
 				E9C967F8137B51A700C6D18B /* AVFoundation.framework in Frameworks */,
 				2FC93025139D8CC500DA0D4F /* AudioToolbox.framework in Frameworks */,
 				E9C967D3137B516200C6D18B /* Cocoa.framework in Frameworks */,
@@ -55,6 +72,11 @@
 		E9C967C3137B516100C6D18B = {
 			isa = PBXGroup;
 			children = (
+				6F2F32B3206BF40500BA10DA /* mac-gl-view.h */,
+				6F2F32B2206BF40500BA10DA /* mac-gl-view.mm */,
+				6F2F32B5206BF4B800BA10DA /* gl-renderer.h */,
+				6F2F32A9206BDB4400BA10DA /* gl-texture-renderer.h */,
+				6F2F32AA206BDB4400BA10DA /* gl-texture-renderer.mm */,
 				E9C967E4137B516200C6D18B /* mac-cam.h */,
 				E9C967E5137B516200C6D18B /* mac-cam.mm */,
 				2FC9301C139D85A500DA0D4F /* utilities.h */,
@@ -62,9 +84,11 @@
 				E9C967DE137B516200C6D18B /* main.mm */,
 				E9C967E0137B516200C6D18B /* mac-cam-prefix.pch */,
 				E9C967DA137B516200C6D18B /* mac-cam-info.plist */,
-				E9C967E7137B516200C6D18B /* MainWindow.xib */,
-				E9C967EA137B516200C6D18B /* MainMenu.xib */,
+				E9C967E7137B516200C6D18B /* window.xib */,
+				E9C967EA137B516200C6D18B /* menu.xib */,
 				E9C967DB137B516200C6D18B /* InfoPlist.strings */,
+				6F2F32AE206BE2EF00BA10DA /* shader.fsh */,
+				6F2F32AF206BE2EF00BA10DA /* shader.vsh */,
 				E9C967D1137B516200C6D18B /* Frameworks */,
 				E9C967CF137B516200C6D18B /* Products */,
 			);
@@ -81,6 +105,8 @@
 		E9C967D1137B516200C6D18B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6F2F32AC206BDC3C00BA10DA /* OpenGL.framework */,
+				6FCCD49D206BD6070039903F /* CoreVideo.framework */,
 				2FC93024139D8CC500DA0D4F /* AudioToolbox.framework */,
 				E9C967F7137B51A700C6D18B /* AVFoundation.framework */,
 				E9C967D2137B516200C6D18B /* Cocoa.framework */,
@@ -139,9 +165,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F2F32B1206BE2F000BA10DA /* shader.vsh in Resources */,
+				6F2F32B0206BE2F000BA10DA /* shader.fsh in Resources */,
 				E9C967DD137B516200C6D18B /* InfoPlist.strings in Resources */,
-				E9C967E9137B516200C6D18B /* MainWindow.xib in Resources */,
-				E9C967EC137B516200C6D18B /* MainMenu.xib in Resources */,
+				E9C967E9137B516200C6D18B /* window.xib in Resources */,
+				E9C967EC137B516200C6D18B /* menu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -155,6 +183,8 @@
 				E9C967DF137B516200C6D18B /* main.mm in Sources */,
 				E9C967E6137B516200C6D18B /* mac-cam.mm in Sources */,
 				2FC9301E139D85A500DA0D4F /* utilities.mm in Sources */,
+				6F2F32AB206BDB4400BA10DA /* gl-texture-renderer.mm in Sources */,
+				6F2F32B4206BF40500BA10DA /* mac-gl-view.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -169,20 +199,20 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		E9C967E7137B516200C6D18B /* MainWindow.xib */ = {
+		E9C967E7137B516200C6D18B /* window.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				E9C967E8137B516200C6D18B /* en */,
 			);
-			name = MainWindow.xib;
+			name = window.xib;
 			sourceTree = "<group>";
 		};
-		E9C967EA137B516200C6D18B /* MainMenu.xib */ = {
+		E9C967EA137B516200C6D18B /* menu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				E9C967EB137B516200C6D18B /* en */,
 			);
-			name = MainMenu.xib;
+			name = menu.xib;
 			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXVariantGroup section */

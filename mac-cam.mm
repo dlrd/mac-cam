@@ -1,7 +1,8 @@
 #import "mac-cam.h"
 #import <AVFoundation/AVFoundation.h>
+#import <OpenGL/OpenGL.h>
 
-@interface AVRecorderDocument () <AVCaptureFileOutputDelegate, AVCaptureFileOutputRecordingDelegate>
+@interface AVRecorderDocument () <AVCaptureFileOutputDelegate, AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>
 
 // Properties for internal use
 @property (retain) AVCaptureDeviceInput *videoDeviceInput;
@@ -85,7 +86,11 @@
 		audioPreviewOutput = [[AVCaptureAudioPreviewOutput alloc] init];
 		[audioPreviewOutput setVolume:0.f];
 		[session addOutput:audioPreviewOutput];
-		
+  
+        videoOutput = [[AVCaptureVideoDataOutput alloc] init];
+        [videoOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()]; // FIXME: Maintain and use a background queue.
+        [session addOutput:videoOutput];
+    
 		// Select devices if any exist
 		AVCaptureDevice *videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 		if (videoDevice) {
@@ -135,7 +140,7 @@
 
 - (NSString *)windowNibName
 {
-	return @"MainWindow";
+	return @"window";
 }
 
 - (void)windowControllerDidLoadNib:(NSWindowController *) aController
@@ -594,6 +599,23 @@
     // applies outputSettings immediately when the session starts previewing, resulting in higher CPU usage
     // and shorter battery life.
     return NO;
+}
+
+- (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
+{
+    CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+
+    if (!pixelBuffer)
+        return;
+
+    NSLog(@"%@", pixelBuffer);
+
+    GLuint textureName = CVOpenGLTextureGetName(pixelBuffer);
+}
+
+- (void)captureOutput:(AVCaptureOutput *)output didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection NS_AVAILABLE(10_7, 6_0);
+{
+
 }
 
 @end
