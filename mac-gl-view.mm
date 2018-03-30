@@ -300,53 +300,8 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink,
 {
     _renderer = new GLCamRenderer();
     _renderer->initWithDefaultFBO(fbo);
-    
-//    NSOpenGLPixelFormatAttribute attributes [] = { NSOpenGLPFADoubleBuffer, 0 };
-//
-//    _glContext = [[NSOpenGLContext alloc]
-//            initWithFormat: [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes]
-//            shareContext:self.openGLContext
-//    ];
-//
-//    _ciContext = [CIContext
-//        contextWithCGLContext: _glContext.CGLContextObj
-//        pixelFormat:_glContext.pixelFormat.CGLPixelFormatObj
-//        colorSpace:CGColorSpaceCreateDeviceRGB()
-//        options:nil
-//    ];
 
     return _renderer;
 }
 
-//- (void) drawRect: (NSRect) theRect
-//{
-//    if (self.lastFrame)
-//    {
-////        CIContext* ciContext = [CIContext contextWithOptions:nil];
-//
-//        CGRect  imageRect;
-//        CIImage *inputImage = [CIImage imageWithCVImageBuffer:self.lastFrame];
-//
-//        CGPoint p = CGPointZero;
-//
-////        p = CGPointMake(
-////                (int)((self.frame.size.width - imageRect.size.width) * 0.5),
-////                (int)((self.frame.size.height - imageRect.size.height) * 0.5));
-//
-//        imageRect = [inputImage extent];
-//
-//        CGLLockContext(self.openGLContext.CGLContextObj);
-//
-//        [_ciContext drawImage:inputImage
-//                atPoint:p
-//                fromRect:imageRect];
-//
-//        CGLFlushDrawable(self.openGLContext.CGLContextObj);
-//
-//        CGLUnlockContext(self.openGLContext.CGLContextObj);
-//
-//    }
-//}
-
 @end
-
