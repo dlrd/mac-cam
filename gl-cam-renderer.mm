@@ -109,10 +109,10 @@ GLCamRenderer::loadBufferData ()
 
     VertexData vertexData [4] =
     {
-        { /* position */ { -0.5, -0.5, 0.0, 1.0 }, /* color */ { 1.0, 0.0, 0.0, 1.0 }, /* uv */ { 0.0, 0.0 } },
-        { /* position */ { -0.5,  0.5, 0.0, 1.0 }, /* color */ { 0.0, 1.0, 0.0, 1.0 }, /* uv */ { 0.0, 1.0 } },
-        { /* position */ {  0.5,  0.5, 0.0, 1.0 }, /* color */ { 0.0, 0.0, 1.0, 1.0 }, /* uv */ { 1.0, 1.0 } },
-        { /* position */ {  0.5, -0.5, 0.0, 1.0 }, /* color */ { 1.0, 1.0, 1.0, 1.0 }, /* uv */ { 1.0, 0.0 } }
+        { /* position */ { -1.0, -1.0, 0.0, 1.0 }, /* color */ { 1.0, 0.0, 0.0, 1.0 }, /* uv */ { 0.0, 0.0 } },
+        { /* position */ { -1.0,  1.0, 0.0, 1.0 }, /* color */ { 0.0, 1.0, 0.0, 1.0 }, /* uv */ { 0.0, 1.0 } },
+        { /* position */ {  1.0,  1.0, 0.0, 1.0 }, /* color */ { 0.0, 0.0, 1.0, 1.0 }, /* uv */ { 1.0, 1.0 } },
+        { /* position */ {  1.0, -1.0, 0.0, 1.0 }, /* color */ { 1.0, 1.0, 1.0, 1.0 }, /* uv */ { 1.0, 0.0 } }
     };
     
     glGenVertexArrays(1, &vertexArrayObject);
@@ -144,7 +144,7 @@ GLCamRenderer::loadBufferData ()
 CVReturn
 GLCamRenderer::renderForTime (CVTimeStamp time)
 {
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearColor(1.0, 1.0, 1.0, 1.0);
     GL_GET_ERROR();
     
     glUseProgram(shaderProgram);
