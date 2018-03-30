@@ -83,11 +83,11 @@
     // Attach outputs to session
     _movieFileOutput = [[AVCaptureMovieFileOutput alloc] init];
     [_movieFileOutput setDelegate:self];
-//        [session addOutput:movieFileOutput];
+    [_session addOutput:_movieFileOutput];
 
     _audioPreviewOutput = [[AVCaptureAudioPreviewOutput alloc] init];
     [_audioPreviewOutput setVolume:0.f];
-//        [session addOutput:audioPreviewOutput];
+    [_session addOutput:_audioPreviewOutput];
 
     _cameraOutputQueue = dispatch_queue_create("CameraOutputQueue", DISPATCH_QUEUE_SERIAL);
 
@@ -647,6 +647,15 @@ bail:
 
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
 {
+    CMFormatDescriptionRef formatDescription = CMSampleBufferGetFormatDescription(sampleBuffer);
+
+    if (kCMMediaType_Video != CMFormatDescriptionGetMediaType(formatDescription))
+        return;
+
+    if (toCVPixelFormatType(cameraTextureType) != CMFormatDescriptionGetMediaSubType(formatDescription))
+        return;
+    
+
     CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
 
     if (!pixelBuffer)
