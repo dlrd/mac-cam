@@ -18,6 +18,13 @@
 
 @implementation OpenGLView
 
+- (GLRenderer *)createRendererWithDefaultFBO:(GLuint)fbo
+{
+    [self doesNotRecognizeSelector:_cmd];
+
+    return nullptr;
+}
+
 - (CVReturn) getFrameForTime:(const CVTimeStamp*)outputTime
 {
 	// There is no autorelease pool when this method is called
