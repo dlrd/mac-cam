@@ -9,6 +9,8 @@ GLuint compileShaderOfType (GLenum type, const char* file);
 
 struct GLRenderer
 {
+    virtual ~GLRenderer () {}
+
     virtual void initWithDefaultFBO (GLuint defaultFBOName) = 0;
     virtual void             resize (GLuint width, GLuint height) = 0;
     virtual CVReturn renderForTime (CVTimeStamp time) = 0;
