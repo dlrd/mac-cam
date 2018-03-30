@@ -15,7 +15,8 @@
 @property (assign) NSTimer *audioLevelTimer;
 @property (retain) NSArray *observers;
 
-@property CVOpenGLTextureCacheRef videoTextureCache;
+@property (retain) __attribute__((NSObject)) CVOpenGLTextureCacheRef videoTextureCache;
+@property (retain) __attribute__((NSObject)) CVOpenGLTextureRef lastTexture;
 
 // Methods for internal use
 - (void)refreshDevices;
@@ -680,7 +681,6 @@ bail:
     CVOpenGLTextureCacheFlush(_videoTextureCache, 0);
 
     CVOpenGLTextureRef texture = NULL;
-
 //    CVPixelBufferLockBaseAddress(pixelBuffer, 0);
     CVReturn err = CVOpenGLTextureCacheCreateTextureFromImage(
         kCFAllocatorDefault,
@@ -708,6 +708,10 @@ bail:
     GLenum textureTarget = CVOpenGLTextureGetTarget(texture);
     if (textureName == 0)
         return;
+    
+    self.lastTexture = texture;
+    
+    CFRelease(texture);
 
     //CMTimeShow(time);
     //NSLog(@"%dx%d", width, height);
