@@ -24,9 +24,12 @@ GLCamRenderer::destroyGL ()
 
 
 void
-GLCamRenderer::resize (GLuint width, GLuint height)
+GLCamRenderer::resize (GLuint width_, GLuint height_)
 {
-
+    glViewport(0, 0, width_, height_);
+    
+    width = width_;
+    height = height_;
 }
 
 void
@@ -35,8 +38,8 @@ GLCamRenderer::loadShader ()
     GLuint vertexShader;
     GLuint fragmentShader;
     
-    vertexShader   = compileShaderOfType(GL_VERTEX_SHADER, [[NSBundle mainBundle] pathForResource:@"shader" ofType:@"vsh"].UTF8String);
-    fragmentShader = compileShaderOfType(GL_FRAGMENT_SHADER, [[NSBundle mainBundle] pathForResource:@"shader" ofType:@"fsh"].UTF8String);
+    vertexShader   = compileShaderOfType(GL_VERTEX_SHADER, [[NSBundle mainBundle] pathForResource:@"cam" ofType:@"vsh"].UTF8String);
+    fragmentShader = compileShaderOfType(GL_FRAGMENT_SHADER, [[NSBundle mainBundle] pathForResource:@"cam" ofType:@"fsh"].UTF8String);
     
     if (0 != vertexShader && 0 != fragmentShader)
     {
@@ -52,25 +55,41 @@ GLCamRenderer::loadShader ()
         
         linkProgram(shaderProgram);
         
+        resolutionUniform = glGetUniformLocation(shaderProgram, "resolution");
+        GL_GET_ERROR();
+        if (resolutionUniform < 0)
+            [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'resolution' uniform."];
+
         positionUniform = glGetUniformLocation(shaderProgram, "p");
         GL_GET_ERROR();
         if (positionUniform < 0)
-        {
             [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'p' uniform."];
-        }
+
         colourAttribute = glGetAttribLocation(shaderProgram, "colour");
         GL_GET_ERROR();
         if (colourAttribute < 0)
-        {
             [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'colour' attribute."];
-        }
+
         positionAttribute = glGetAttribLocation(shaderProgram, "position");
         GL_GET_ERROR();
         if (positionAttribute < 0)
-        {
             [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'position' attribute."];
-        }
-        
+
+        texCoordAttribute = glGetAttribLocation(shaderProgram, "inTexcoord");
+        GL_GET_ERROR();
+        if (positionAttribute < 0)
+            [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'texCoord' attribute."];
+
+        lumaUniform = glGetUniformLocation(shaderProgram, "luma");
+        GL_GET_ERROR();
+        if (lumaUniform < 0)
+            [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'luma' uniform."];
+
+//        chromaUniform = glGetUniformLocation(shaderProgram, "chroma");
+//        GL_GET_ERROR();
+//        if (chromaUniform < 0)
+//            [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'chroma' uniform."];
+
         glDeleteShader(vertexShader  );
         GL_GET_ERROR();
         glDeleteShader(fragmentShader);
@@ -82,14 +101,23 @@ GLCamRenderer::loadShader ()
     }
 }
 
+struct VertexData
+{
+    Vector4 position;
+    Colour  colour;
+    Vector2 texCoord;
+};
+
 void
 GLCamRenderer::loadBufferData ()
 {
-    Vertex vertexData[4] = {
-        { .position = { .x=-0.5, .y=-0.5, .z=0.0, .w=1.0 }, .colour = { .r=1.0, .g=0.0, .b=0.0, .a=1.0 } },
-        { .position = { .x=-0.5, .y= 0.5, .z=0.0, .w=1.0 }, .colour = { .r=0.0, .g=1.0, .b=0.0, .a=1.0 } },
-        { .position = { .x= 0.5, .y= 0.5, .z=0.0, .w=1.0 }, .colour = { .r=0.0, .g=0.0, .b=1.0, .a=1.0 } },
-        { .position = { .x= 0.5, .y=-0.5, .z=0.0, .w=1.0 }, .colour = { .r=1.0, .g=1.0, .b=1.0, .a=1.0 } }
+
+    VertexData vertexData [4] =
+    {
+        { /* position */ { -0.5, -0.5, 0.0, 1.0 }, /* colour */ { 1.0, 0.0, 0.0, 1.0 }, /* tex coord */ { 0.0, 0.0 } },
+        { /* position */ { -0.5,  0.5, 0.0, 1.0 }, /* colour */ { 0.0, 1.0, 0.0, 1.0 }, /* tex coord */ { 0.0, 1.0 } },
+        { /* position */ {  0.5,  0.5, 0.0, 1.0 }, /* colour */ { 0.0, 0.0, 1.0, 1.0 }, /* tex coord */ { 1.0, 1.0 } },
+        { /* position */ {  0.5, -0.5, 0.0, 1.0 }, /* colour */ { 1.0, 1.0, 1.0, 1.0 }, /* tex coord */ { 1.0, 0.0 } }
     };
     
     glGenVertexArrays(1, &vertexArrayObject);
@@ -101,16 +129,20 @@ GLCamRenderer::loadBufferData ()
     GL_GET_ERROR();
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     GL_GET_ERROR();
-    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), vertexData, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(VertexData), vertexData, GL_STATIC_DRAW);
     GL_GET_ERROR();
     
     glEnableVertexAttribArray((GLuint)positionAttribute);
     GL_GET_ERROR();
     glEnableVertexAttribArray((GLuint)colourAttribute  );
     GL_GET_ERROR();
-    glVertexAttribPointer((GLuint)positionAttribute, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *)offsetof(Vertex, position));
+    glEnableVertexAttribArray((GLuint)texCoordAttribute  );
     GL_GET_ERROR();
-    glVertexAttribPointer((GLuint)colourAttribute  , 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *)offsetof(Vertex, colour  ));
+    glVertexAttribPointer((GLuint)positionAttribute, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const GLvoid *)offsetof(VertexData, position));
+    GL_GET_ERROR();
+    glVertexAttribPointer((GLuint)colourAttribute  , 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const GLvoid *)offsetof(VertexData, colour  ));
+    GL_GET_ERROR();
+    glVertexAttribPointer((GLuint)texCoordAttribute, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const GLvoid *)offsetof(VertexData, texCoord  ));
     GL_GET_ERROR();
 }
 
@@ -130,8 +162,34 @@ GLCamRenderer::renderForTime (CVTimeStamp time)
 
     Vector2 p = { .x = 0.5f * sinf(timeValue), .y = 0.5f * cosf(timeValue) };
 
+    glUniform2f(resolutionUniform, width, height);
+    GL_GET_ERROR();
+
     glUniform2fv(positionUniform, 1, (const GLfloat *)&p);
     GL_GET_ERROR();
+
+    GLint lumaUnit = 0;
+    glUniform1i(lumaUniform, lumaUnit);
+    GL_GET_ERROR();
+
+    GLint chromaUnit = 1;
+    glUniform1i(chromaUniform, chromaUnit);
+    GL_GET_ERROR();
+    
+    if (textureName > 0)
+    {
+        glActiveTexture(GL_TEXTURE0);
+        GL_GET_ERROR();
+        glBindTexture(textureTarget, textureName);
+        GL_GET_ERROR();
+
+        glTexParameteri(textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+        GL_GET_ERROR();
+    }
     
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     GL_GET_ERROR();

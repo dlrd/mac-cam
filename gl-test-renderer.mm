@@ -35,8 +35,8 @@ GLTestRenderer::loadShader ()
     GLuint vertexShader;
     GLuint fragmentShader;
     
-    vertexShader   = compileShaderOfType(GL_VERTEX_SHADER  , [[NSBundle mainBundle] pathForResource:@"shader" ofType:@"vsh"].UTF8String);
-    fragmentShader = compileShaderOfType(GL_FRAGMENT_SHADER, [[NSBundle mainBundle] pathForResource:@"shader" ofType:@"fsh"].UTF8String);
+    vertexShader   = compileShaderOfType(GL_VERTEX_SHADER  , [[NSBundle mainBundle] pathForResource:@"test" ofType:@"vsh"].UTF8String);
+    fragmentShader = compileShaderOfType(GL_FRAGMENT_SHADER, [[NSBundle mainBundle] pathForResource:@"test" ofType:@"fsh"].UTF8String);
     
     if (0 != vertexShader && 0 != fragmentShader)
     {
@@ -85,11 +85,12 @@ GLTestRenderer::loadShader ()
 void
 GLTestRenderer::loadBufferData ()
 {
-    Vertex vertexData[4] = {
-        { .position = { .x=-0.5, .y=-0.5, .z=0.0, .w=1.0 }, .colour = { .r=1.0, .g=0.0, .b=0.0, .a=1.0 } },
-        { .position = { .x=-0.5, .y= 0.5, .z=0.0, .w=1.0 }, .colour = { .r=0.0, .g=1.0, .b=0.0, .a=1.0 } },
-        { .position = { .x= 0.5, .y= 0.5, .z=0.0, .w=1.0 }, .colour = { .r=0.0, .g=0.0, .b=1.0, .a=1.0 } },
-        { .position = { .x= 0.5, .y=-0.5, .z=0.0, .w=1.0 }, .colour = { .r=1.0, .g=1.0, .b=1.0, .a=1.0 } }
+    Vertex vertexData[4] =
+    {
+        { /* position */ { -0.5, -0.5, 0.0, 1.0 }, /* colour */ { 1.0, 0.0, 0.0, 1.0 } },
+        { /* position */ { -0.5,  0.5, 0.0, 1.0 }, /* colour */ { 0.0, 1.0, 0.0, 1.0 } },
+        { /* position */ {  0.5,  0.5, 0.0, 1.0 }, /* colour */ { 0.0, 0.0, 1.0, 1.0 } },
+        { /* position */ {  0.5, -0.5, 0.0, 1.0 }, /* colour */ { 1.0, 1.0, 1.0, 1.0 } }
     };
     
     glGenVertexArrays(1, &vertexArrayObject);

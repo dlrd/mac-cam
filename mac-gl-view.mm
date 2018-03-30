@@ -3,6 +3,7 @@
 #import "gl-test-renderer.h"
 #import "gl-cam-renderer.h"
 #import <QuartzCore/CVDisplayLink.h>
+#import <CoreImage/CoreImage.h>
 
 #define SUPPORT_RETINA_RESOLUTION 1
 
@@ -57,11 +58,12 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink,
 {
     NSOpenGLPixelFormatAttribute attrs[] =
 	{
-		NSOpenGLPFADoubleBuffer,
-		NSOpenGLPFADepthSize, 24,
-		NSOpenGLPFAOpenGLProfile,
-		NSOpenGLProfileVersion3_2Core,
-
+        NSOpenGLPFAAccelerated,
+        NSOpenGLPFADoubleBuffer,
+        NSOpenGLPFANoRecovery,
+        NSOpenGLPFADepthSize, 24,
+        NSOpenGLPFAColorSize, 32,
+		NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
 		0
 	};
 	
@@ -152,7 +154,9 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink,
 - (void)reshape
 {	
 	[super reshape];
-	
+
+    [self.openGLContext makeCurrentContext];
+
 	// We draw on a secondary thread through the display link. However, when
 	// resizing the view, -drawRect is called on the main thread.
 	// Add a mutex around to avoid the threads accessing the context
@@ -268,6 +272,10 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink,
 @implementation OpenGLCamView
 {
     GLCamRenderer* _renderer;
+    
+    CIContext* _ciContext;
+    
+    NSOpenGLContext* _glContext;
 }
 
 - (unsigned)textureName
@@ -275,17 +283,72 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink,
     return _renderer->textureName;
 }
 
+- (unsigned)textureTarget
+{
+    return _renderer->textureTarget;
+}
+
 - (void)setTextureName:(unsigned)textureName
 {
     _renderer->textureName = textureName;
+}
+
+- (void)setTextureTarget:(unsigned)textureTarget
+{
+    _renderer->textureTarget = textureTarget;
 }
 
 - (GLRenderer*) createRendererWithDefaultFBO: (GLuint)fbo;
 {
     _renderer = new GLCamRenderer();
     _renderer->initWithDefaultFBO(fbo);
+    
+//    NSOpenGLPixelFormatAttribute attributes [] = { NSOpenGLPFADoubleBuffer, 0 };
+//
+//    _glContext = [[NSOpenGLContext alloc]
+//            initWithFormat: [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes]
+//            shareContext:self.openGLContext
+//    ];
+//
+//    _ciContext = [CIContext
+//        contextWithCGLContext: _glContext.CGLContextObj
+//        pixelFormat:_glContext.pixelFormat.CGLPixelFormatObj
+//        colorSpace:CGColorSpaceCreateDeviceRGB()
+//        options:nil
+//    ];
+
     return _renderer;
 }
+
+//- (void) drawRect: (NSRect) theRect
+//{
+//    if (self.lastFrame)
+//    {
+////        CIContext* ciContext = [CIContext contextWithOptions:nil];
+//
+//        CGRect  imageRect;
+//        CIImage *inputImage = [CIImage imageWithCVImageBuffer:self.lastFrame];
+//
+//        CGPoint p = CGPointZero;
+//
+////        p = CGPointMake(
+////                (int)((self.frame.size.width - imageRect.size.width) * 0.5),
+////                (int)((self.frame.size.height - imageRect.size.height) * 0.5));
+//
+//        imageRect = [inputImage extent];
+//
+//        CGLLockContext(self.openGLContext.CGLContextObj);
+//
+//        [_ciContext drawImage:inputImage
+//                atPoint:p
+//                fromRect:imageRect];
+//
+//        CGLFlushDrawable(self.openGLContext.CGLContextObj);
+//
+//        CGLUnlockContext(self.openGLContext.CGLContextObj);
+//
+//    }
+//}
 
 @end
 

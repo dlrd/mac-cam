@@ -15,6 +15,8 @@
 @property (assign) NSTimer *audioLevelTimer;
 @property (retain) NSArray *observers;
 
+@property CVOpenGLTextureCacheRef videoTextureCache;
+
 // Methods for internal use
 - (void)refreshDevices;
 - (void)setTransportMode:(AVCaptureDeviceTransportControlsPlaybackMode)playbackMode speed:(AVCaptureDeviceTransportControlsSpeed)speed forDevice:(AVCaptureDevice *)device;
@@ -82,17 +84,27 @@
 		// Attach outputs to session
 		movieFileOutput = [[AVCaptureMovieFileOutput alloc] init];
 		[movieFileOutput setDelegate:self];
-		[session addOutput:movieFileOutput];
+//		[session addOutput:movieFileOutput];
 		
 		audioPreviewOutput = [[AVCaptureAudioPreviewOutput alloc] init];
 		[audioPreviewOutput setVolume:0.f];
-		[session addOutput:audioPreviewOutput];
-  
+//		[session addOutput:audioPreviewOutput];
+
         videoOutput = [[AVCaptureVideoDataOutput alloc] init];
         [videoOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()]; // FIXME: Maintain and use a background queue.
+
+        videoOutput.videoSettings = @{
+            (NSString*)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_422YpCbCr8),
+            (NSString*)kCVPixelBufferOpenGLCompatibilityKey : @YES,
+            (NSString*)kCVPixelBufferIOSurfacePropertiesKey : @{},
+        };
+
+        //[videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32RGBA] forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
+        //[videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarFullRange] forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
+        //[videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:NSNull.null forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
+
         [session addOutput:videoOutput];
-    
-		// Select devices if any exist
+
 		AVCaptureDevice *videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 		if (videoDevice) {
 			[self setSelectedVideoDevice:videoDevice];
@@ -135,7 +147,9 @@
 	[previewLayer release];
 	[videoDeviceInput release];
 	[audioDeviceInput release];
-	
+
+    CFRelease(_videoTextureCache);
+
 	[super dealloc];
 }
 
@@ -163,6 +177,22 @@
 	
 	// Start updating the audio level meter
 	[self setAudioLevelTimer:[NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(updateAudioLevels:) userInfo:nil repeats:YES]];
+
+    [self.glCamView.openGLContext makeCurrentContext];
+
+    CVReturn err = CVOpenGLTextureCacheCreate(
+        kCFAllocatorDefault,
+        NULL,
+        self.glCamView.openGLContext.CGLContextObj,
+        self.glCamView.pixelFormat.CGLPixelFormatObj,
+        NULL,
+        &_videoTextureCache
+    );
+    if (err != noErr)
+    {
+        NSLog(@"CVOpenGLESTextureCacheCreate failed: %d", err);
+        abort();
+    }
 }
 
 - (void)didPresentErrorWithRecovery:(BOOL)didRecover contextInfo:(void  *)contextInfo
@@ -602,6 +632,34 @@
     return NO;
 }
 
+- (CVOpenGLTextureRef)textureForPixelBuffer:(CVPixelBufferRef)pixelBuffer
+{
+    CVOpenGLTextureRef texture = NULL;
+    CVReturn err;
+    
+    if (!_videoTextureCache) {
+        NSLog(@"No video texture cache");
+        goto bail;
+    }
+    
+    // Periodic texture cache flush every frame
+    
+    // CVOpenGLTextureCacheCreateTextureFromImage will create GL texture optimally from CVPixelBufferRef.
+    
+    err = CVOpenGLTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
+                                                     _videoTextureCache,
+                                                     pixelBuffer,
+                                                     NULL,
+                                                     &texture);
+    
+    if (!texture || err) {
+        NSLog(@"Error at creating luma texture using CVOpenGLTextureCacheCreateTextureFromImage %d", err);
+    }
+    
+bail:
+    return texture;
+}
+
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
 {
     CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
@@ -609,11 +667,55 @@
     if (!pixelBuffer)
         return;
 
-    NSLog(@"%@", pixelBuffer);
+    self.glCamView.lastFrame = pixelBuffer;
 
-    GLuint textureName = CVOpenGLTextureGetName(pixelBuffer);
+    CMTime time = CMSampleBufferGetOutputPresentationTimeStamp(sampleBuffer);
+    int width = (int) CVPixelBufferGetWidth(pixelBuffer);
+    int height = (int) CVPixelBufferGetHeight(pixelBuffer);
+
+    IOSurfaceRef surface = CVPixelBufferGetIOSurface(pixelBuffer);
+
+    [self.glCamView.openGLContext makeCurrentContext];
     
+    CVOpenGLTextureCacheFlush(_videoTextureCache, 0);
+
+    CVOpenGLTextureRef texture = NULL;
+
+//    CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+    CVReturn err = CVOpenGLTextureCacheCreateTextureFromImage(
+        kCFAllocatorDefault,
+        _videoTextureCache,
+        pixelBuffer,
+        NULL,
+        &texture
+    );
+//   CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+
+    if (!texture || err)
+    {
+        NSLog(@"CVOpenGLTextureCacheCreateTextureFromImage failed: %d", err);
+        NSLog(@"%@", pixelBuffer);
+    
+        abort();
+    }
+    else
+    {
+//        NSLog(@"CVOpenGLTextureCacheCreateTextureFromImage succeeded.");
+//        NSLog(@"%@", pixelBuffer);
+    }
+
+    GLuint textureName = CVOpenGLTextureGetName(texture);
+    GLenum textureTarget = CVOpenGLTextureGetTarget(texture);
+    if (textureName == 0)
+        return;
+
+    //CMTimeShow(time);
+    //NSLog(@"%dx%d", width, height);
+//    NSLog(@"%@", pixelBuffer);
+//    NSLog(@"%@", texture);
+
     self.glCamView.textureName = textureName;
+    self.glCamView.textureTarget = textureTarget;
 }
 
 - (void)captureOutput:(AVCaptureOutput *)output didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection NS_AVAILABLE(10_7, 6_0);
