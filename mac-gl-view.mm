@@ -248,8 +248,6 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink,
 	CVDisplayLinkRelease(displayLink);
 
     delete _renderer;
-
-    [super dealloc];
 }
 @end
 

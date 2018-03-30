@@ -6,17 +6,17 @@
 @interface AVRecorderDocument () <AVCaptureFileOutputDelegate, AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>
 
 // Properties for internal use
-@property (retain) AVCaptureDeviceInput *videoDeviceInput;
-@property (retain) AVCaptureDeviceInput *audioDeviceInput;
+@property (strong) AVCaptureDeviceInput *videoDeviceInput;
+@property (strong) AVCaptureDeviceInput *audioDeviceInput;
 @property (readonly) BOOL selectedVideoDeviceProvidesAudio;
-@property (retain) AVCaptureAudioPreviewOutput *audioPreviewOutput;
-@property (retain) AVCaptureMovieFileOutput *movieFileOutput;
-@property (retain) AVCaptureVideoPreviewLayer *previewLayer;
+@property (strong) AVCaptureAudioPreviewOutput *audioPreviewOutput;
+@property (strong) AVCaptureMovieFileOutput *movieFileOutput;
+@property (strong) AVCaptureVideoPreviewLayer *previewLayer;
 @property (assign) NSTimer *audioLevelTimer;
-@property (retain) NSArray *observers;
+@property (strong) NSArray *observers;
 
-@property (retain) __attribute__((NSObject)) CVOpenGLTextureCacheRef videoTextureCache;
-@property (retain) __attribute__((NSObject)) CVOpenGLTextureRef lastTexture;
+@property (strong) __attribute__((NSObject)) CVOpenGLTextureCacheRef videoTextureCache;
+@property (strong) __attribute__((NSObject)) CVOpenGLTextureRef lastTexture;
 
 // Methods for internal use
 - (void)refreshDevices;
@@ -26,30 +26,17 @@
 
 @implementation AVRecorderDocument
 
-@synthesize videoDeviceInput;
-@synthesize audioDeviceInput;
-@synthesize videoDevices;
-@synthesize audioDevices;
-@synthesize session;
-@synthesize audioLevelMeter;
-@synthesize audioPreviewOutput;
-@synthesize movieFileOutput;
-@synthesize previewView;
-@synthesize previewLayer;
-@synthesize audioLevelTimer;
-@synthesize observers;
-
 - (id)init
 {
 	self = [super init];
 	if (self) {
 		// Create a capture session
-		session = [[AVCaptureSession alloc] init];
+		_session = [[AVCaptureSession alloc] init];
 		
 		// Capture Notification Observers
 		NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 		id runtimeErrorObserver = [notificationCenter addObserverForName:AVCaptureSessionRuntimeErrorNotification
-																  object:session
+																  object:_session
 																   queue:[NSOperationQueue mainQueue]
 															  usingBlock:^(NSNotification *note) {
 																  dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -57,13 +44,13 @@
 																  });
 															  }];
 		id didStartRunningObserver = [notificationCenter addObserverForName:AVCaptureSessionDidStartRunningNotification
-																	 object:session
+																	 object:_session
 																	  queue:[NSOperationQueue mainQueue]
 																 usingBlock:^(NSNotification *note) {
 																	 NSLog(@"did start running");
 																 }];
 		id didStopRunningObserver = [notificationCenter addObserverForName:AVCaptureSessionDidStopRunningNotification
-																	object:session
+																	object:_session
 																	 queue:[NSOperationQueue mainQueue]
 																usingBlock:^(NSNotification *note) {
 																	NSLog(@"did stop running");
@@ -80,21 +67,21 @@
 																	   usingBlock:^(NSNotification *note) {
 																		   [self refreshDevices];
 																	   }];
-		observers = [[NSArray alloc] initWithObjects:runtimeErrorObserver, didStartRunningObserver, didStopRunningObserver, deviceWasConnectedObserver, deviceWasDisconnectedObserver, nil];
+		_observers = [[NSArray alloc] initWithObjects:runtimeErrorObserver, didStartRunningObserver, didStopRunningObserver, deviceWasConnectedObserver, deviceWasDisconnectedObserver, nil];
 		
 		// Attach outputs to session
-		movieFileOutput = [[AVCaptureMovieFileOutput alloc] init];
-		[movieFileOutput setDelegate:self];
+		_movieFileOutput = [[AVCaptureMovieFileOutput alloc] init];
+		[_movieFileOutput setDelegate:self];
 //		[session addOutput:movieFileOutput];
 		
-		audioPreviewOutput = [[AVCaptureAudioPreviewOutput alloc] init];
-		[audioPreviewOutput setVolume:0.f];
+		_audioPreviewOutput = [[AVCaptureAudioPreviewOutput alloc] init];
+		[_audioPreviewOutput setVolume:0.f];
 //		[session addOutput:audioPreviewOutput];
 
-        videoOutput = [[AVCaptureVideoDataOutput alloc] init];
-        [videoOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()]; // FIXME: Maintain and use a background queue.
+        _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
+        [_videoOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()]; // FIXME: Maintain and use a background queue.
 
-        videoOutput.videoSettings = @{
+        _videoOutput.videoSettings = @{
             (NSString*)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_422YpCbCr8),
             (NSString*)kCVPixelBufferOpenGLCompatibilityKey : @YES,
             (NSString*)kCVPixelBufferIOSurfacePropertiesKey : @{},
@@ -104,7 +91,7 @@
         //[videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarFullRange] forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
         //[videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:NSNull.null forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
 
-        [session addOutput:videoOutput];
+        [_session addOutput:_videoOutput];
 
 		AVCaptureDevice *videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 		if (videoDevice) {
@@ -126,7 +113,7 @@
 	[[self audioLevelTimer] invalidate];
 	
 	// Stop the session
-	[[self session] stopRunning];
+	[_session stopRunning];
 	
 	// Set movie file output delegate to nil to avoid a dangling pointer
 	[[self movieFileOutput] setDelegate:nil];
@@ -135,23 +122,6 @@
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	for (id observer in [self observers])
 		[notificationCenter removeObserver:observer];
-	[observers release];
-}
-
-- (void)dealloc
-{
-	[videoDevices release];
-	[audioDevices release];
-	[session release];
-	[audioPreviewOutput release];
-	[movieFileOutput release];
-	[previewLayer release];
-	[videoDeviceInput release];
-	[audioDeviceInput release];
-
-    CFRelease(_videoTextureCache);
-
-	[super dealloc];
 }
 
 - (NSString *)windowNibName
@@ -166,15 +136,14 @@
 	// Attach preview to session
 	CALayer *previewViewLayer = [[self previewView] layer];
 	[previewViewLayer setBackgroundColor:CGColorGetConstantColor(kCGColorBlack)];
-	AVCaptureVideoPreviewLayer *newPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:[self session]];
+	AVCaptureVideoPreviewLayer *newPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_session];
 	[newPreviewLayer setFrame:[previewViewLayer bounds]];
 	[newPreviewLayer setAutoresizingMask:kCALayerWidthSizable | kCALayerHeightSizable];
 	[previewViewLayer addSublayer:newPreviewLayer];
 	[self setPreviewLayer:newPreviewLayer];
-	[newPreviewLayer release];
 	
 	// Start the session
-	[[self session] startRunning];
+	[_session startRunning];
 	
 	// Start updating the audio level meter
 	[self setAudioLevelTimer:[NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(updateAudioLevels:) userInfo:nil repeats:YES]];
@@ -207,7 +176,7 @@
 	[self setVideoDevices:[[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] arrayByAddingObjectsFromArray:[AVCaptureDevice devicesWithMediaType:AVMediaTypeMuxed]]];
 	[self setAudioDevices:[AVCaptureDevice devicesWithMediaType:AVMediaTypeAudio]];
 	
-	[[self session] beginConfiguration];
+	[_session beginConfiguration];
 	
 	if (![[self videoDevices] containsObject:[self selectedVideoDevice]])
 		[self setSelectedVideoDevice:nil];
@@ -215,21 +184,21 @@
 	if (![[self audioDevices] containsObject:[self selectedAudioDevice]])
 		[self setSelectedAudioDevice:nil];
 	
-	[[self session] commitConfiguration];
+	[_session commitConfiguration];
 }
 
 - (AVCaptureDevice *)selectedVideoDevice
 {
-	return [videoDeviceInput device];
+	return [_videoDeviceInput device];
 }
 
 - (void)setSelectedVideoDevice:(AVCaptureDevice *)selectedVideoDevice
 {
-	[[self session] beginConfiguration];
+	[_session beginConfiguration];
 	
 	if ([self videoDeviceInput]) {
 		// Remove the old device input from the session
-		[session removeInput:[self videoDeviceInput]];
+		[_session removeInput:[self videoDeviceInput]];
 		[self setVideoDeviceInput:nil];
 	}
 	
@@ -243,10 +212,10 @@
 				[self presentError:error];
 			});
 		} else {
-			if (![selectedVideoDevice supportsAVCaptureSessionPreset:[session sessionPreset]])
-				[[self session] setSessionPreset:AVCaptureSessionPresetHigh];
+			if (![selectedVideoDevice supportsAVCaptureSessionPreset:[_session sessionPreset]])
+				[_session setSessionPreset:AVCaptureSessionPresetHigh];
 			
-			[[self session] addInput:newVideoDeviceInput];
+			[_session addInput:newVideoDeviceInput];
 			[self setVideoDeviceInput:newVideoDeviceInput];
 		}
 	}
@@ -255,21 +224,21 @@
 	if ([self selectedVideoDeviceProvidesAudio])
 		[self setSelectedAudioDevice:nil];
 	
-	[[self session] commitConfiguration];
+	[_session commitConfiguration];
 }
 
 - (AVCaptureDevice *)selectedAudioDevice
 {
-	return [audioDeviceInput device];
+	return [_audioDeviceInput device];
 }
 
 - (void)setSelectedAudioDevice:(AVCaptureDevice *)selectedAudioDevice
 {
-	[[self session] beginConfiguration];
+	[_session beginConfiguration];
 	
-	if ([self audioDeviceInput]) {
+	if (_audioDeviceInput) {
 		// Remove the old device input from the session
-		[session removeInput:[self audioDeviceInput]];
+		[_session removeInput:[self audioDeviceInput]];
 		[self setAudioDeviceInput:nil];
 	}
 	
@@ -283,15 +252,15 @@
 				[self presentError:error];
 			});
 		} else {
-			if (![selectedAudioDevice supportsAVCaptureSessionPreset:[session sessionPreset]])
-				[[self session] setSessionPreset:AVCaptureSessionPresetHigh];
+			if (![selectedAudioDevice supportsAVCaptureSessionPreset:[_session sessionPreset]])
+				[_session setSessionPreset:AVCaptureSessionPresetHigh];
 			
-			[[self session] addInput:newAudioDeviceInput];
+			[_session addInput:newAudioDeviceInput];
 			[self setAudioDeviceInput:newAudioDeviceInput];
 		}
 	}
 	
-	[[self session] commitConfiguration];
+	[_session commitConfiguration];
 }
 
 #pragma mark - Device Properties
@@ -411,7 +380,7 @@
 
 - (BOOL)hasRecordingDevice
 {
-	return ((videoDeviceInput != nil) || (audioDeviceInput != nil));
+	return ((_videoDeviceInput != nil) || (_audioDeviceInput != nil));
 }
 
 + (NSSet *)keyPathsForValuesAffectingRecording
@@ -429,7 +398,7 @@
 	if (record) {
 		// Record to a temporary file, which the user will relocate when recording is finished
 		char *tempNameBytes = tempnam([NSTemporaryDirectory() fileSystemRepresentation], "AVRecorder_");
-		NSString *tempName = [[[NSString alloc] initWithBytesNoCopy:tempNameBytes length:strlen(tempNameBytes) encoding:NSUTF8StringEncoding freeWhenDone:YES] autorelease];
+		NSString *tempName = [[NSString alloc] initWithBytesNoCopy:tempNameBytes length:strlen(tempNameBytes) encoding:NSUTF8StringEncoding freeWhenDone:YES];
 		
 		[[self movieFileOutput] startRecordingToOutputFileURL:[NSURL fileURLWithPath:[tempName stringByAppendingPathExtension:@"mov"]]
 											recordingDelegate:self];
@@ -459,7 +428,7 @@
 	
 	NSMutableArray *availableSessionPresets = [NSMutableArray arrayWithCapacity:9];
 	for (NSString *sessionPreset in allSessionPresets) {
-		if ([[self session] canSetSessionPreset:sessionPreset])
+		if ([_session canSetSessionPreset:sessionPreset])
 			[availableSessionPresets addObject:sessionPreset];
 	}
 	

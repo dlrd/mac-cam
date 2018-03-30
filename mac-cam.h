@@ -15,30 +15,13 @@
 @class OpenGLCamView;
 
 @interface AVRecorderDocument : NSDocument
-{
-@private
-	NSView						*previewView;
-	AVCaptureVideoPreviewLayer	*previewLayer;
-	NSLevelIndicator			*audioLevelMeter;
-	
-	AVCaptureSession			*session;
-	AVCaptureDeviceInput		*videoDeviceInput;
-	AVCaptureDeviceInput		*audioDeviceInput;
-	AVCaptureMovieFileOutput	*movieFileOutput;
-	AVCaptureAudioPreviewOutput	*audioPreviewOutput;
-    AVCaptureVideoDataOutput    *videoOutput;
-	
-	NSArray						*videoDevices;
-	NSArray						*audioDevices;
-	
-	NSTimer						*audioLevelTimer;
-	
-	NSArray						*observers;
-}
+
+@property (strong) AVCaptureVideoDataOutput* videoOutput;
 
 #pragma mark Device Selection
-@property (retain) NSArray *videoDevices;
-@property (retain) NSArray *audioDevices;
+@property (strong) NSArray *videoDevices;
+@property (strong) NSArray *audioDevices;
+
 @property (assign) AVCaptureDevice *selectedVideoDevice;
 @property (assign) AVCaptureDevice *selectedAudioDevice;
 
@@ -49,10 +32,10 @@
 - (IBAction)lockVideoDeviceForConfiguration:(id)sender;
 
 #pragma mark - Recording
-@property (retain) AVCaptureSession *session;
+@property (strong) AVCaptureSession *session;
 @property (readonly) NSArray *availableSessionPresets;
 @property (readonly) BOOL hasRecordingDevice;
-@property (assign,getter=isRecording) BOOL recording;
+@property (assign, getter=isRecording) BOOL recording;
 
 #pragma mark - Preview
 @property (assign) IBOutlet NSView *previewView;
@@ -64,6 +47,7 @@
 @property (readonly,getter=isPlaying) BOOL playing;
 @property (readonly,getter=isRewinding) BOOL rewinding;
 @property (readonly,getter=isFastForwarding) BOOL fastForwarding;
+
 - (IBAction)stop:(id)sender;
 
 @end

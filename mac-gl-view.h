@@ -18,6 +18,6 @@
 
 @property (nonatomic) unsigned textureName;
 @property (nonatomic) unsigned textureTarget;
-@property (retain) __attribute__((NSObject)) CVPixelBufferRef lastFrame;
+@property (strong) __attribute__((NSObject)) CVPixelBufferRef lastFrame;
 
 @end
