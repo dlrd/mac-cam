@@ -1,9 +1,10 @@
 #version 150
 
-in vec4 colourV;
-out vec4 fragColour;
+in vec4 var_color;
+
+out vec4 out_rgba;
 
 void main(void)
 {
-    fragColour = colourV;
+    out_rgba = var_color;
 }

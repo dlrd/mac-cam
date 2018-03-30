@@ -48,25 +48,27 @@ GLTestRenderer::loadShader ()
         glAttachShader(shaderProgram, fragmentShader);
         GL_GET_ERROR();
         
-        glBindFragDataLocation(shaderProgram, 0, "fragColour");
+        glBindFragDataLocation(shaderProgram, 0, "out_rgba");
         
         linkProgram(shaderProgram);
         
-        positionUniform = glGetUniformLocation(shaderProgram, "p");
+        u_origin = glGetUniformLocation(shaderProgram, "u_origin");
         GL_GET_ERROR();
-        if (positionUniform < 0)
+        if (u_origin < 0)
         {
-            [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'p' uniform."];
+            [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'origin' uniform."];
         }
-        colourAttribute = glGetAttribLocation(shaderProgram, "colour");
+
+        in_color = glGetAttribLocation(shaderProgram, "in_color");
         GL_GET_ERROR();
-        if (colourAttribute < 0)
+        if (in_color < 0)
         {
-            [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'colour' attribute."];
+            [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'color' attribute."];
         }
-        positionAttribute = glGetAttribLocation(shaderProgram, "position");
+
+        in_position = glGetAttribLocation(shaderProgram, "in_position");
         GL_GET_ERROR();
-        if (positionAttribute < 0)
+        if (in_position < 0)
         {
             [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'position' attribute."];
         }
@@ -82,15 +84,22 @@ GLTestRenderer::loadShader ()
     }
 }
 
+struct VertexData
+{
+    Vector4 position;
+    Colour  color;
+    Vector2 uv;
+};
+
 void
 GLTestRenderer::loadBufferData ()
 {
-    Vertex vertexData[4] =
+    VertexData vertexData [4] =
     {
-        { /* position */ { -0.5, -0.5, 0.0, 1.0 }, /* colour */ { 1.0, 0.0, 0.0, 1.0 } },
-        { /* position */ { -0.5,  0.5, 0.0, 1.0 }, /* colour */ { 0.0, 1.0, 0.0, 1.0 } },
-        { /* position */ {  0.5,  0.5, 0.0, 1.0 }, /* colour */ { 0.0, 0.0, 1.0, 1.0 } },
-        { /* position */ {  0.5, -0.5, 0.0, 1.0 }, /* colour */ { 1.0, 1.0, 1.0, 1.0 } }
+        { /* position */ { -0.5, -0.5, 0.0, 1.0 }, /* color */ { 1.0, 0.0, 0.0, 1.0 } },
+        { /* position */ { -0.5,  0.5, 0.0, 1.0 }, /* color */ { 0.0, 1.0, 0.0, 1.0 } },
+        { /* position */ {  0.5,  0.5, 0.0, 1.0 }, /* color */ { 0.0, 0.0, 1.0, 1.0 } },
+        { /* position */ {  0.5, -0.5, 0.0, 1.0 }, /* color */ { 1.0, 1.0, 1.0, 1.0 } }
     };
     
     glGenVertexArrays(1, &vertexArrayObject);
@@ -102,16 +111,16 @@ GLTestRenderer::loadBufferData ()
     GL_GET_ERROR();
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     GL_GET_ERROR();
-    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), vertexData, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(VertexData), vertexData, GL_STATIC_DRAW);
     GL_GET_ERROR();
     
-    glEnableVertexAttribArray((GLuint)positionAttribute);
+    glEnableVertexAttribArray((GLuint)in_position);
     GL_GET_ERROR();
-    glEnableVertexAttribArray((GLuint)colourAttribute  );
+    glEnableVertexAttribArray((GLuint)in_color);
     GL_GET_ERROR();
-    glVertexAttribPointer((GLuint)positionAttribute, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *)offsetof(Vertex, position));
+    glVertexAttribPointer((GLuint)in_position, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const GLvoid *)offsetof(VertexData, position));
     GL_GET_ERROR();
-    glVertexAttribPointer((GLuint)colourAttribute  , 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *)offsetof(Vertex, colour  ));
+    glVertexAttribPointer((GLuint)in_color  , 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const GLvoid *)offsetof(VertexData, color));
     GL_GET_ERROR();
 }
 
@@ -131,9 +140,9 @@ GLTestRenderer::renderForTime (CVTimeStamp time)
 
     Vector2 p = { .x = 0.5f * sinf(timeValue), .y = 0.5f * cosf(timeValue) };
 
-    glUniform2fv(positionUniform, 1, (const GLfloat *)&p);
+    glUniform2fv(u_origin, 1, (const GLfloat *)&p);
     GL_GET_ERROR();
-    
+
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     GL_GET_ERROR();
     

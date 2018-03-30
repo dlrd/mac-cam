@@ -17,20 +17,18 @@ struct GLCamRenderer : GLRenderer
     GLuint vertexArrayObject;
     GLuint vertexBuffer;
     
-    GLint resolutionUniform = -1;
-    GLint positionUniform = -1;
-
-    GLint colourAttribute = -1;
-    GLint positionAttribute = -1;
-    GLint texCoordAttribute = -1;
-
     GLuint _fbo;
     
+    GLint u_resolution = -1;
+    GLint u_time = -1;
+    GLint u_frame = -1;
+
+    GLint in_color = -1;
+    GLint in_position = -1;
+    GLint in_uv = -1;
+
     GLenum textureTarget = 0;
     GLuint textureName = 0;
-
-    GLint lumaUniform = -1;
-    GLint chromaUniform = -1;
     
     unsigned width = 0;
     unsigned height = 0;

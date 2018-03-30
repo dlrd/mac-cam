@@ -17,9 +17,10 @@ struct GLTestRenderer : GLRenderer
     GLuint vertexArrayObject;
     GLuint vertexBuffer;
     
-    GLint positionUniform;
-    GLint colourAttribute;
-    GLint positionAttribute;
+    GLint u_origin;
+
+    GLint in_position;
+    GLint in_color;
 
     GLuint _fbo;
 };

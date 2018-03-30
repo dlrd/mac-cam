@@ -1,17 +1,17 @@
 #version 150
 
-uniform vec2 resolution;
-uniform vec2 p;
-uniform sampler2DRect luma;
-
-in vec4 position;
-in vec4 colour;
-in vec2  inTexcoord;
-
-out vec4 colourV;
-out vec2 varTexcoord;
-
 const bool wandering = true;
+
+uniform vec2          u_resolution;
+uniform float         u_time;
+uniform sampler2DRect u_frame;
+
+in vec4 in_position;
+in vec4 in_color;
+in vec2 in_uv;
+
+out vec4 var_color;
+out vec2 var_uv;
 
 mat3
 orthographic2d (vec2 resolution)
@@ -58,13 +58,13 @@ translate2d (vec2 t)
 
 void main (void)
 {
-    vec2 dims = textureSize(luma);
-
-    mat3 scaling = scale2d(vec2(dims.x / dims.y, 1.0));
-    mat3 translation = translate2d(vec2(wandering) * p);
-    mat3 projection = orthographic2d(resolution);
+    vec2 size = textureSize(u_frame);
+    vec2 offset = vec2(0.5 * sin(u_time), 0.5 * cos(u_time));
+    mat3 scaling = scale2d(vec2(size.x / size.y, 1.0));
+    mat3 translation = translate2d(vec2(wandering) * offset);
+    mat3 projection = orthographic2d(u_resolution);
     
-    gl_Position = vec4((scaling * vec3(position.xy, 1) * translation * projection).xy, 0, 1);
-    varTexcoord = inTexcoord;
-    colourV = colour;
+    gl_Position = vec4((scaling * vec3(in_position.xy, 1) * translation * projection).xy, 0, 1);
+    var_color = in_color;
+    var_uv = in_uv;
 }

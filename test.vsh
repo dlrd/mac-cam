@@ -1,14 +1,14 @@
 #version 150
 
-uniform vec2 p;
+uniform vec2 u_origin;
 
-in vec4 position;
-in vec4 colour;
+in vec4 in_position;
+in vec4 in_color;
 
-out vec4 colourV;
+out vec4 var_color;
 
 void main (void)
 {
-    colourV = colour;
-    gl_Position = vec4(p, 0.0, 0.0) + position;
+    var_color = in_color;
+    gl_Position = vec4(u_origin, 0.0, 0.0) + in_position;
 }
