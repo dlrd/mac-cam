@@ -54,8 +54,6 @@ constexpr CameraTextureType cameraTextureType = CameraTextureType::_422YpCbCr8;
 
 @interface AVRecorderDocument : NSDocument
 
-@property (strong) AVCaptureVideoDataOutput* videoOutput;
-
 #pragma mark Device Selection
 @property (strong) NSArray *videoDevices;
 @property (strong) NSArray *audioDevices;

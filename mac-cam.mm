@@ -15,7 +15,12 @@
 @property (assign) NSTimer *audioLevelTimer;
 @property (strong) NSArray *observers;
 
+@property (strong) AVCaptureVideoDataOutput* videoOutput;
+
+@property (strong) __attribute__((NSObject)) dispatch_queue_t cameraOutputQueue;
+
 @property (strong) __attribute__((NSObject)) CVOpenGLTextureCacheRef videoTextureCache;
+
 @property (strong) __attribute__((NSObject)) CVOpenGLTextureRef lastTexture;
 
 // Methods for internal use
@@ -78,8 +83,10 @@
 		[_audioPreviewOutput setVolume:0.f];
 //		[session addOutput:audioPreviewOutput];
 
+        _cameraOutputQueue = dispatch_queue_create("CameraOutputQueue", DISPATCH_QUEUE_SERIAL);
+
         _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
-        [_videoOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()]; // FIXME: Maintain and use a background queue.
+        [_videoOutput setSampleBufferDelegate:self queue:_cameraOutputQueue];
 
         _videoOutput.videoSettings = @{
             (NSString*)kCVPixelBufferPixelFormatTypeKey : @(toCVPixelFormatType(cameraTextureType)),
