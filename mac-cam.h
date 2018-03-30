@@ -2,6 +2,44 @@
 
 #import <Cocoa/Cocoa.h>
 
+enum class CameraTextureType
+{
+    Invalid = -1,
+
+    _422YpCbCr8,
+    _32BGRA,
+};
+
+#include <CoreVideo/CoreVideo.h>
+
+inline OSType
+toCVPixelFormatType (CameraTextureType from)
+{
+    switch (from)
+    {
+        case CameraTextureType::_422YpCbCr8: return kCVPixelFormatType_422YpCbCr8;
+        case CameraTextureType::_32BGRA      : return kCVPixelFormatType_32BGRA;
+
+        default:
+            return -1;
+    }
+}
+
+inline CameraTextureType
+toCameraTextureType (OSType from)
+{
+    switch (from)
+    {
+        case kCVPixelFormatType_422YpCbCr8: return CameraTextureType::_422YpCbCr8;
+        case kCVPixelFormatType_32BGRA    : return CameraTextureType::_32BGRA;
+
+        default:
+            return CameraTextureType::Invalid;
+    }
+}
+
+constexpr CameraTextureType cameraTextureType = CameraTextureType::_422YpCbCr8;
+
 @class AVCaptureVideoPreviewLayer;
 @class AVCaptureSession;
 @class AVCaptureDeviceInput;

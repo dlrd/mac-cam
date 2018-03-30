@@ -82,7 +82,7 @@
         [_videoOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()]; // FIXME: Maintain and use a background queue.
 
         _videoOutput.videoSettings = @{
-            (NSString*)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_422YpCbCr8),
+            (NSString*)kCVPixelBufferPixelFormatTypeKey : @(toCVPixelFormatType(cameraTextureType)),
             (NSString*)kCVPixelBufferOpenGLCompatibilityKey : @YES,
             (NSString*)kCVPixelBufferIOSurfacePropertiesKey : @{},
         };
