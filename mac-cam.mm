@@ -33,85 +33,89 @@
 
 - (id)init
 {
-	self = [super init];
-	if (self) {
-		// Create a capture session
-		_session = [[AVCaptureSession alloc] init];
-		
-		// Capture Notification Observers
-		NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-		id runtimeErrorObserver = [notificationCenter addObserverForName:AVCaptureSessionRuntimeErrorNotification
-																  object:_session
-																   queue:[NSOperationQueue mainQueue]
-															  usingBlock:^(NSNotification *note) {
-																  dispatch_async(dispatch_get_main_queue(), ^(void) {
-																	  [self presentError:[[note userInfo] objectForKey:AVCaptureSessionErrorKey]];
-																  });
-															  }];
-		id didStartRunningObserver = [notificationCenter addObserverForName:AVCaptureSessionDidStartRunningNotification
-																	 object:_session
-																	  queue:[NSOperationQueue mainQueue]
-																 usingBlock:^(NSNotification *note) {
-																	 NSLog(@"did start running");
-																 }];
-		id didStopRunningObserver = [notificationCenter addObserverForName:AVCaptureSessionDidStopRunningNotification
-																	object:_session
-																	 queue:[NSOperationQueue mainQueue]
-																usingBlock:^(NSNotification *note) {
-																	NSLog(@"did stop running");
-																}];
-		id deviceWasConnectedObserver = [notificationCenter addObserverForName:AVCaptureDeviceWasConnectedNotification
-																		object:nil
-																		 queue:[NSOperationQueue mainQueue]
-																	usingBlock:^(NSNotification *note) {
-																		[self refreshDevices];
-																	}];
-		id deviceWasDisconnectedObserver = [notificationCenter addObserverForName:AVCaptureDeviceWasDisconnectedNotification
-																		   object:nil
-																			queue:[NSOperationQueue mainQueue]
-																	   usingBlock:^(NSNotification *note) {
-																		   [self refreshDevices];
-																	   }];
-		_observers = [[NSArray alloc] initWithObjects:runtimeErrorObserver, didStartRunningObserver, didStopRunningObserver, deviceWasConnectedObserver, deviceWasDisconnectedObserver, nil];
-		
-		// Attach outputs to session
-		_movieFileOutput = [[AVCaptureMovieFileOutput alloc] init];
-		[_movieFileOutput setDelegate:self];
-//		[session addOutput:movieFileOutput];
-		
-		_audioPreviewOutput = [[AVCaptureAudioPreviewOutput alloc] init];
-		[_audioPreviewOutput setVolume:0.f];
-//		[session addOutput:audioPreviewOutput];
+	if (!(self = [super init]))
+        return nil;
 
-        _cameraOutputQueue = dispatch_queue_create("CameraOutputQueue", DISPATCH_QUEUE_SERIAL);
-
-        _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
-        [_videoOutput setSampleBufferDelegate:self queue:_cameraOutputQueue];
-
-        _videoOutput.videoSettings = @{
-            (NSString*)kCVPixelBufferPixelFormatTypeKey : @(toCVPixelFormatType(cameraTextureType)),
-            (NSString*)kCVPixelBufferOpenGLCompatibilityKey : @YES,
-            (NSString*)kCVPixelBufferIOSurfacePropertiesKey : @{},
-        };
-
-        //[videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32RGBA] forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
-        //[videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarFullRange] forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
-        //[videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:NSNull.null forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
-
-        [_session addOutput:_videoOutput];
-
-		AVCaptureDevice *videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-		if (videoDevice) {
-			[self setSelectedVideoDevice:videoDevice];
-			[self setSelectedAudioDevice:[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio]];
-		} else {
-			[self setSelectedVideoDevice:[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeMuxed]];
-		}
-		
-		// Initial refresh of device list
-		[self refreshDevices];
-	}
 	return self;
+}
+
+- (void)setupCapture
+{
+    // Create a capture session
+    _session = [[AVCaptureSession alloc] init];
+
+    // Capture Notification Observers
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    id runtimeErrorObserver = [notificationCenter addObserverForName:AVCaptureSessionRuntimeErrorNotification
+                                                              object:_session
+                                                               queue:[NSOperationQueue mainQueue]
+                                                          usingBlock:^(NSNotification *note) {
+                                                              dispatch_async(dispatch_get_main_queue(), ^(void) {
+                                                                  [self presentError:[[note userInfo] objectForKey:AVCaptureSessionErrorKey]];
+                                                              });
+                                                          }];
+    id didStartRunningObserver = [notificationCenter addObserverForName:AVCaptureSessionDidStartRunningNotification
+                                                                 object:_session
+                                                                  queue:[NSOperationQueue mainQueue]
+                                                             usingBlock:^(NSNotification *note) {
+                                                                 NSLog(@"did start running");
+                                                             }];
+    id didStopRunningObserver = [notificationCenter addObserverForName:AVCaptureSessionDidStopRunningNotification
+                                                                object:_session
+                                                                 queue:[NSOperationQueue mainQueue]
+                                                            usingBlock:^(NSNotification *note) {
+                                                                NSLog(@"did stop running");
+                                                            }];
+    id deviceWasConnectedObserver = [notificationCenter addObserverForName:AVCaptureDeviceWasConnectedNotification
+                                                                    object:nil
+                                                                     queue:[NSOperationQueue mainQueue]
+                                                                usingBlock:^(NSNotification *note) {
+                                                                    [self refreshDevices];
+                                                                }];
+    id deviceWasDisconnectedObserver = [notificationCenter addObserverForName:AVCaptureDeviceWasDisconnectedNotification
+                                                                       object:nil
+                                                                        queue:[NSOperationQueue mainQueue]
+                                                                   usingBlock:^(NSNotification *note) {
+                                                                       [self refreshDevices];
+                                                                   }];
+    _observers = [[NSArray alloc] initWithObjects:runtimeErrorObserver, didStartRunningObserver, didStopRunningObserver, deviceWasConnectedObserver, deviceWasDisconnectedObserver, nil];
+
+    // Attach outputs to session
+    _movieFileOutput = [[AVCaptureMovieFileOutput alloc] init];
+    [_movieFileOutput setDelegate:self];
+//        [session addOutput:movieFileOutput];
+
+    _audioPreviewOutput = [[AVCaptureAudioPreviewOutput alloc] init];
+    [_audioPreviewOutput setVolume:0.f];
+//        [session addOutput:audioPreviewOutput];
+
+    _cameraOutputQueue = dispatch_queue_create("CameraOutputQueue", DISPATCH_QUEUE_SERIAL);
+
+    _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
+    [_videoOutput setSampleBufferDelegate:self queue:_cameraOutputQueue];
+
+    _videoOutput.videoSettings = @{
+        (NSString*)kCVPixelBufferPixelFormatTypeKey : @(toCVPixelFormatType(cameraTextureType)),
+        (NSString*)kCVPixelBufferOpenGLCompatibilityKey : @YES,
+        (NSString*)kCVPixelBufferIOSurfacePropertiesKey : @{},
+    };
+
+    //[videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32RGBA] forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
+    //[videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarFullRange] forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
+    //[videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:NSNull.null forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
+
+    [_session addOutput:_videoOutput];
+
+    AVCaptureDevice *videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    if (videoDevice) {
+        [self setSelectedVideoDevice:videoDevice];
+        [self setSelectedAudioDevice:[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio]];
+    } else {
+        [self setSelectedVideoDevice:[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeMuxed]];
+    }
+
+    // Initial refresh of device list
+    [self refreshDevices];
 }
 
 - (void)windowWillClose:(NSNotification *)notification
@@ -139,7 +143,9 @@
 - (void)windowControllerDidLoadNib:(NSWindowController *) aController
 {
 	[super windowControllerDidLoadNib:aController];
-	
+
+    [self setupCapture];
+
 	// Attach preview to session
 	CALayer *previewViewLayer = [[self previewView] layer];
 	[previewViewLayer setBackgroundColor:CGColorGetConstantColor(kCGColorBlack)];
@@ -148,10 +154,7 @@
 	[newPreviewLayer setAutoresizingMask:kCALayerWidthSizable | kCALayerHeightSizable];
 	[previewViewLayer addSublayer:newPreviewLayer];
 	[self setPreviewLayer:newPreviewLayer];
-	
-	// Start the session
-	[_session startRunning];
-	
+		
 	// Start updating the audio level meter
 	[self setAudioLevelTimer:[NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(updateAudioLevels:) userInfo:nil repeats:YES]];
 
@@ -170,6 +173,11 @@
         NSLog(@"CVOpenGLESTextureCacheCreate failed: %d", err);
         abort();
     }
+
+    // Start the session aysnchronously, or GL init will happen too late :-/
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.session startRunning];
+    });
 }
 
 - (void)didPresentErrorWithRecovery:(BOOL)didRecover contextInfo:(void  *)contextInfo
