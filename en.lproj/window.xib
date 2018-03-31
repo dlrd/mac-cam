@@ -37,7 +37,7 @@
                                 </buttonCell>
                                 <connections>
                                     <action selector="stop:" target="-2" id="100367"/>
-                                    <binding destination="-2" name="enabled" keyPath="selectedVideoDevice.transportControlsSupported" id="100248"/>
+                                    <binding destination="-2" name="enabled" keyPath="capture.selectedVideoDevice.transportControlsSupported" id="100248"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -51,13 +51,13 @@
                             <menu key="menu" title="OtherViews" id="100407"/>
                         </popUpButtonCell>
                         <connections>
-                            <binding destination="-2" name="selectedObject" keyPath="selectedVideoDevice" previousBinding="100427" id="100428"/>
-                            <binding destination="-2" name="content" keyPath="videoDevices" id="100426">
+                            <binding destination="-2" name="selectedObject" keyPath="capture.selectedVideoDevice" previousBinding="100427" id="100428"/>
+                            <binding destination="-2" name="content" keyPath="capture.videoDevices" id="100426">
                                 <dictionary key="options">
                                     <integer key="NSInsertsNullPlaceholder" value="1"/>
                                 </dictionary>
                             </binding>
-                            <binding destination="-2" name="contentValues" keyPath="videoDevices.localizedName" previousBinding="100426" id="100427">
+                            <binding destination="-2" name="contentValues" keyPath="capture.videoDevices.localizedName" previousBinding="100426" id="100427">
                                 <dictionary key="options">
                                     <integer key="NSInsertsNullPlaceholder" value="1"/>
                                 </dictionary>
@@ -73,9 +73,9 @@
                             <menu key="menu" title="OtherViews" id="100399"/>
                         </popUpButtonCell>
                         <connections>
-                            <binding destination="-2" name="content" keyPath="selectedVideoDevice.formats" id="100445"/>
-                            <binding destination="-2" name="contentValues" keyPath="selectedVideoDevice.formats.localizedName" previousBinding="100445" id="100451"/>
-                            <binding destination="-2" name="selectedObject" keyPath="videoDeviceFormat" previousBinding="100451" id="100460"/>
+                            <binding destination="-2" name="content" keyPath="capture.selectedVideoDevice.formats" id="100445"/>
+                            <binding destination="-2" name="contentValues" keyPath="capture.selectedVideoDevice.formats.localizedName" previousBinding="100445" id="100451"/>
+                            <binding destination="-2" name="selectedObject" keyPath="capture.videoDeviceFormat" previousBinding="100451" id="100460"/>
                         </connections>
                     </popUpButton>
                     <popUpButton verticalHuggingPriority="750" imageHugsTitle="YES" id="100393">
@@ -87,9 +87,9 @@
                             <menu key="menu" title="OtherViews" id="100395"/>
                         </popUpButtonCell>
                         <connections>
-                            <binding destination="-2" name="selectedObject" keyPath="frameRateRange" previousBinding="100458" id="100464"/>
-                            <binding destination="-2" name="content" keyPath="selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges" id="100456"/>
-                            <binding destination="-2" name="contentValues" keyPath="selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges.localizedName" previousBinding="100456" id="100458"/>
+                            <binding destination="-2" name="selectedObject" keyPath="capture.frameRateRange" previousBinding="100458" id="100464"/>
+                            <binding destination="-2" name="content" keyPath="capture.selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges" id="100456"/>
+                            <binding destination="-2" name="contentValues" keyPath="capture.selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges.localizedName" previousBinding="100456" id="100458"/>
                         </connections>
                     </popUpButton>
                     <textField verticalHuggingPriority="750" id="100408">
@@ -123,8 +123,8 @@
                             <menu key="menu" title="OtherViews" id="100469"/>
                         </popUpButtonCell>
                         <connections>
-                            <binding destination="-2" name="content" keyPath="availableSessionPresets" id="100474"/>
-                            <binding destination="-2" name="selectedObject" keyPath="session.sessionPreset" previousBinding="100474" id="100476"/>
+                            <binding destination="-2" name="content" keyPath="capture.availableSessionPresets" id="100474"/>
+                            <binding destination="-2" name="selectedObject" keyPath="capture.session.sessionPreset" previousBinding="100474" id="100476"/>
                         </connections>
                     </popUpButton>
                 </subviews>

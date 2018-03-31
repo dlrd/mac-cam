@@ -67,13 +67,7 @@ struct CameraCapture
 
 @interface AVCaptureDocument : NSDocument
 
-// FIXME: These are fake, for now.
-@property (readonly) NSArray* availableSessionPresets;
-@property (strong)  AVCaptureSession* session;
-@property (assign)        AVCaptureDevice*          selectedVideoDevice;
-@property (assign)        AVCaptureDeviceFormat*    videoDeviceFormat;
-@property (assign)        AVFrameRateRange*         frameRateRange;
-@property (strong) NSArray *videoDevices;
+@property (readonly) NSObject* capture;
 
 @property (assign) IBOutlet OpenGLCamView *glCamView;
 

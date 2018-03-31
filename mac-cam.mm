@@ -516,6 +516,11 @@ CameraCapture::stop ()
     cameraCapture.stop();
 }
 
+- (NSObject*) capture
+{
+    return cameraCapture.that->objc;
+}
+
 //- (void)forwardInvocation:(NSInvocation *)anInvocation
 //{
 //    if ([cameraCapture.that->objc respondsToSelector: [anInvocation selector]])
