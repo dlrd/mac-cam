@@ -1,7 +1,9 @@
 #pragma once
 
 #import <Cocoa/Cocoa.h>
-#import "gl-renderer.h"
+#import "mac-cam.h"
+
+struct GLRenderer;
 
 @interface OpenGLView : NSOpenGLView
 
@@ -16,8 +18,6 @@
 // FIXME: Wrong spot.
 @interface OpenGLCamView : OpenGLView
 
-@property (nonatomic) unsigned textureName;
-@property (nonatomic) unsigned textureTarget;
-@property (strong) __attribute__((NSObject)) CVPixelBufferRef lastFrame;
+@property (nonatomic) CameraCapture::FramePtr cameraFrame;
 
 @end

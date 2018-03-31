@@ -276,31 +276,15 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink,
 
 @implementation OpenGLCamView
 {
-    GLCamRenderer* _renderer;
-    
-    CIContext* _ciContext;
-    
+    GLCamRenderer*   _renderer;    
     NSOpenGLContext* _glContext;
 }
 
-- (unsigned)textureName
+- (void)setCameraFrame:(CameraCapture::FramePtr)cameraFrame
 {
-    return _renderer->textureName;
-}
-
-- (unsigned)textureTarget
-{
-    return _renderer->textureTarget;
-}
-
-- (void)setTextureName:(unsigned)textureName
-{
-    _renderer->textureName = textureName;
-}
-
-- (void)setTextureTarget:(unsigned)textureTarget
-{
-    _renderer->textureTarget = textureTarget;
+    _cameraFrame = cameraFrame;
+    _renderer->textureName = cameraFrame->glTextureName();
+    _renderer->textureTarget = cameraFrame->glTextureTarget();
 }
 
 - (GLRenderer*) createRendererWithDefaultFBO: (GLuint)fbo;

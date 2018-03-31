@@ -1,88 +1,81 @@
 #pragma once
 
-#import <Cocoa/Cocoa.h>
+//------------------------------------------------------------------------------
 
-enum class CameraTextureType
+#include <memory>
+#include <functional>
+
+#define MAC_CAM_DECLARE_OPAQUE_INTERNALS(Class) \
+public: \
+    ~Class (); \
+    struct That; \
+     Class (That* that_) : that(that_) {} \
+    That* that;
+
+struct CameraCapture
 {
-    Invalid = -1,
+    static double nowInSeconds ();
 
-    _422YpCbCr8,
-    _32BGRA,
+    enum class TextureType
+    {
+        Invalid = -1,
+
+        _422YpCbCr8,
+        _32BGRA,
+    };
+
+    struct Frame
+    {
+        int width ();
+        int height ();
+
+        double timeInSeconds ();
+    
+        GLuint glTextureName ();
+        GLenum glTextureTarget ();
+
+        TextureType textureType ();
+
+        MAC_CAM_DECLARE_OPAQUE_INTERNALS(Frame)
+    };
+
+    using FramePtr = std::shared_ptr<Frame>;
+
+    struct Settings
+    {
+        TextureType                    cameraTextureType = TextureType::_422YpCbCr8;
+        std::function<void ()        > makeOpenGLContextCurrent;
+        std::function<void (FramePtr)> cameraFrameWasCaptured;
+    };
+
+    CameraCapture ();
+
+    void  setup (const Settings& settings);
+
+    void  start ();
+    void  stop ();
+
+    MAC_CAM_DECLARE_OPAQUE_INTERNALS(CameraCapture)
 };
 
-#include <CoreVideo/CoreVideo.h>
+//------------------------------------------------------------------------------
 
-inline OSType
-toCVPixelFormatType (CameraTextureType from)
-{
-    switch (from)
-    {
-        case CameraTextureType::_422YpCbCr8: return kCVPixelFormatType_422YpCbCr8;
-        case CameraTextureType::_32BGRA      : return kCVPixelFormatType_32BGRA;
+#import <Cocoa/Cocoa.h>
+#import <AVFoundation/AVFoundation.h>
 
-        default:
-            return -1;
-    }
-}
-
-inline CameraTextureType
-toCameraTextureType (OSType from)
-{
-    switch (from)
-    {
-        case kCVPixelFormatType_422YpCbCr8: return CameraTextureType::_422YpCbCr8;
-        case kCVPixelFormatType_32BGRA    : return CameraTextureType::_32BGRA;
-
-        default:
-            return CameraTextureType::Invalid;
-    }
-}
-
-constexpr CameraTextureType cameraTextureType = CameraTextureType::_422YpCbCr8;
-
-@class AVCaptureVideoPreviewLayer;
-@class AVCaptureSession;
-@class AVCaptureDeviceInput;
-@class AVCaptureMovieFileOutput;
-@class AVCaptureAudioPreviewOutput;
-@class AVCaptureConnection;
-@class AVCaptureDevice;
-@class AVCaptureDeviceFormat;
-@class AVFrameRateRange;
-@class AVCaptureVideoDataOutput;
 @class OpenGLCamView;
 
-@interface AVRecorderDocument : NSDocument
+@interface AVCaptureDocument : NSDocument
 
-#pragma mark Device Selection
+// FIXME: These are fake, for now.
+@property (readonly) NSArray* availableSessionPresets;
+@property (strong)  AVCaptureSession* session;
+@property (assign)        AVCaptureDevice*          selectedVideoDevice;
+@property (assign)        AVCaptureDeviceFormat*    videoDeviceFormat;
+@property (assign)        AVFrameRateRange*         frameRateRange;
 @property (strong) NSArray *videoDevices;
-@property (strong) NSArray *audioDevices;
 
-@property (assign) AVCaptureDevice *selectedVideoDevice;
-@property (assign) AVCaptureDevice *selectedAudioDevice;
-
-#pragma mark - Device Properties
-@property (assign) AVCaptureDeviceFormat *videoDeviceFormat;
-@property (assign) AVCaptureDeviceFormat *audioDeviceFormat;
-@property (assign) AVFrameRateRange *frameRateRange;
-- (IBAction)lockVideoDeviceForConfiguration:(id)sender;
-
-#pragma mark - Recording
-@property (strong) AVCaptureSession *session;
-@property (readonly) NSArray *availableSessionPresets;
-@property (readonly) BOOL hasRecordingDevice;
-@property (assign, getter=isRecording) BOOL recording;
-
-#pragma mark - Preview
-@property (assign) IBOutlet NSView *previewView;
-@property (assign) float previewVolume;
-@property (assign) IBOutlet NSLevelIndicator *audioLevelMeter;
 @property (assign) IBOutlet OpenGLCamView *glCamView;
-
-#pragma mark - Transport Controls
-@property (readonly,getter=isPlaying) BOOL playing;
-@property (readonly,getter=isRewinding) BOOL rewinding;
-@property (readonly,getter=isFastForwarding) BOOL fastForwarding;
 
 - (IBAction)stop:(id)sender;
 
