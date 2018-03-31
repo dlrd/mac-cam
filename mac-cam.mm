@@ -267,13 +267,13 @@ CameraCapture::Frame::~Frame ()
 
 - (AVCaptureDeviceFormat *)videoDeviceFormat
 {
-    return [[self selectedVideoDevice] activeFormat];
+    return self.selectedVideoDevice.activeFormat;
 }
 
 - (void)setVideoDeviceFormat:(AVCaptureDeviceFormat *)deviceFormat
 {
     NSError *error = nil;
-    AVCaptureDevice *videoDevice = [self selectedVideoDevice];
+    AVCaptureDevice *videoDevice = self.selectedVideoDevice;
     if ([videoDevice lockForConfiguration:&error]) {
         [videoDevice setActiveFormat:deviceFormat];
         [videoDevice unlockForConfiguration];
@@ -292,9 +292,9 @@ CameraCapture::Frame::~Frame ()
 - (AVFrameRateRange *)frameRateRange
 {
     AVFrameRateRange *activeFrameRateRange = nil;
-    for (AVFrameRateRange *frameRateRange in [[[self selectedVideoDevice] activeFormat] videoSupportedFrameRateRanges])
+    for (AVFrameRateRange *frameRateRange in self.selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges)
     {
-        if (CMTIME_COMPARE_INLINE([frameRateRange minFrameDuration], ==, [[self selectedVideoDevice] activeVideoMinFrameDuration]))
+        if (CMTIME_COMPARE_INLINE([frameRateRange minFrameDuration], ==, self.selectedVideoDevice.activeVideoMinFrameDuration))
         {
             activeFrameRateRange = frameRateRange;
             break;
@@ -307,11 +307,11 @@ CameraCapture::Frame::~Frame ()
 - (void)setFrameRateRange:(AVFrameRateRange *)frameRateRange
 {
     NSError *error = nil;
-    if ([[[[self selectedVideoDevice] activeFormat] videoSupportedFrameRateRanges] containsObject:frameRateRange])
+    if ([self.selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges containsObject:frameRateRange])
     {
-        if ([[self selectedVideoDevice] lockForConfiguration:&error]) {
-            [[self selectedVideoDevice] setActiveVideoMinFrameDuration:[frameRateRange minFrameDuration]];
-            [[self selectedVideoDevice] unlockForConfiguration];
+        if ([self.selectedVideoDevice lockForConfiguration:&error]) {
+            [self.selectedVideoDevice setActiveVideoMinFrameDuration:frameRateRange.minFrameDuration];
+            [self.selectedVideoDevice unlockForConfiguration];
         } else {
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 [self presentError:error];
