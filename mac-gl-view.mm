@@ -1,7 +1,7 @@
 #import "mac-gl-view.h"
-#import "gl-renderer.h"
-#import "gl-test-renderer.h"
-#import "gl-cam-renderer.h"
+#import "gl-app/gl-app.h"
+#import "gl-app/renderers/gl-test-renderer.h"
+#import "gl-app/renderers/gl-cam-renderer.h"
 #import <QuartzCore/CVDisplayLink.h>
 #import <CoreImage/CoreImage.h>
 

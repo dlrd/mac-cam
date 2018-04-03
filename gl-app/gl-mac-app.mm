@@ -21,6 +21,18 @@ double toHostSeconds (CVTimeStamp t)
     return toSeconds(t.hostTime - program_startup_time);
 }
 
+GLuint
+compileShaderResource (GLenum type, const char* name)
+{
+    return compileShaderFile(
+        type,
+        [[NSBundle mainBundle]
+            pathForResource:[NSString stringWithUTF8String: name]
+            ofType: [NSString stringWithUTF8String: shaderExtension(type)]
+        ].UTF8String
+    );
+}
+
 @implementation AVCaptureDeviceFormat (AVRecorderAdditions)
 
 - (NSString *)localizedName

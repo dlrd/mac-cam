@@ -1,6 +1,6 @@
 #pragma once
 
-#import "gl-renderer.h"
+#import "gl-app.h"
 
 struct GLCamRenderer : GLRenderer
 {

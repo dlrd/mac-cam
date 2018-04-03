@@ -4,9 +4,18 @@
 #include <cstdlib>
 #include <cmath>
 
+#if __APPLE__
+#   define GL_MAC_APP 1
+#endif
+
 #if GL_MAC_APP
 #   include <OpenGL/OpenGL.h>
 #   include <OpenGL/gl3.h>
+
+#   include <CoreVideo/CoreVideo.h>
+double toSeconds (uint64_t mach_host_time);
+double toHostSeconds (CVTimeStamp t);
+
 #else
 #   define GLFW_INCLUDE_GLCOREARB 1
 #   define GLFW_INCLUDE_GLEXT 1
@@ -35,14 +44,8 @@ typedef struct
     Colour colour;
 } Vertex;
 
-#if GL_MAC_APP
-#   define kFailedToInitialiseGLException @"Failed to initialise OpenGL"
 #   define GL_REPORT_FAILURE(...) \
-[NSException raise:kFailedToInitialiseGLException format:@__VA_ARGS__];
-#else
-#   define GL_REPORT_FAILURE(...) \
-    { printf(__VA_ARGS__); fflush(stdout); abort(); }
-#endif
+    { printf("OpenGL failure: " __VA_ARGS__); fflush(stdout); abort(); }
 
 #if DEBUG && !defined(NDEBUG)
 
@@ -120,6 +123,7 @@ void  validateProgram (GLuint program);
 void   linkProgram (GLuint program);
 GLuint compileShaderResource (GLenum type, const char* path);
 GLuint compileShaderFile (GLenum type, const char* path);
+const char* shaderExtension (GLenum type);
 
 struct GLRenderer
 {

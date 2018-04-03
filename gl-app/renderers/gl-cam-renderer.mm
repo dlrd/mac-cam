@@ -1,6 +1,6 @@
 #import "gl-cam-renderer.h"
+#import "gl-mac-app.h"
 #import <OpenGL/gl3.h>
-#import "utilities.h"
 
 #define kFailedToInitialiseGLException @"Failed to initialise OpenGL"
 
@@ -38,8 +38,8 @@ GLCamRenderer::loadShader ()
     GLuint vertexShader;
     GLuint fragmentShader;
     
-    vertexShader   = compileShaderOfType(GL_VERTEX_SHADER, [[NSBundle mainBundle] pathForResource:@"cam" ofType:@"vsh"].UTF8String);
-    fragmentShader = compileShaderOfType(GL_FRAGMENT_SHADER, [[NSBundle mainBundle] pathForResource:@"cam" ofType:@"fsh"].UTF8String);
+    vertexShader   = compileShaderResource(GL_VERTEX_SHADER, "cam");
+    fragmentShader = compileShaderResource(GL_FRAGMENT_SHADER, "cam");
     
     if (0 != vertexShader && 0 != fragmentShader)
     {

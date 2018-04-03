@@ -7,20 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2FC9301E139D85A500DA0D4F /* utilities.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2FC9301D139D85A500DA0D4F /* utilities.mm */; };
 		2FC93021139D875D00DA0D4F /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FC93020139D875D00DA0D4F /* CoreMedia.framework */; };
 		2FC93025139D8CC500DA0D4F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FC93024139D8CC500DA0D4F /* AudioToolbox.framework */; };
-		6F2F32AB206BDB4400BA10DA /* gl-cam-renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6F2F32AA206BDB4400BA10DA /* gl-cam-renderer.mm */; };
+		6F1CE0282073F99000852EC1 /* gl-test-renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F1CE01A2073F99000852EC1 /* gl-test-renderer.cpp */; };
+		6F1CE0292073F99000852EC1 /* gl-cam-renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6F1CE01C2073F99000852EC1 /* gl-cam-renderer.mm */; };
+		6F1CE02C2073F99000852EC1 /* gl-app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F1CE0202073F99000852EC1 /* gl-app.cpp */; };
+		6F1CE02D2073F99000852EC1 /* test.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 6F1CE0222073F99000852EC1 /* test.fsh */; };
+		6F1CE02E2073F99000852EC1 /* cam.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 6F1CE0232073F99000852EC1 /* cam.vsh */; };
+		6F1CE02F2073F99000852EC1 /* test.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 6F1CE0242073F99000852EC1 /* test.vsh */; };
+		6F1CE0302073F99000852EC1 /* cam.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 6F1CE0252073F99000852EC1 /* cam.fsh */; };
+		6F1CE0312073F99000852EC1 /* gl-mac-app.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6F1CE0272073F99000852EC1 /* gl-mac-app.mm */; };
 		6F2F32AD206BDC3C00BA10DA /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F2F32AC206BDC3C00BA10DA /* OpenGL.framework */; };
-		6F2F32B0206BE2F000BA10DA /* cam.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 6F2F32AE206BE2EF00BA10DA /* cam.fsh */; };
-		6F2F32B1206BE2F000BA10DA /* cam.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 6F2F32AF206BE2EF00BA10DA /* cam.vsh */; };
 		6F2F32B4206BF40500BA10DA /* mac-gl-view.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6F2F32B2206BF40500BA10DA /* mac-gl-view.mm */; };
-		6FADACA9206D170300E8B07E /* test.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 6FADACA7206D170300E8B07E /* test.fsh */; };
-		6FADACAA206D170300E8B07E /* test.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 6FADACA8206D170300E8B07E /* test.vsh */; };
 		6FADACAC206D37FE00E8B07E /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FADACAB206D37FE00E8B07E /* CoreImage.framework */; };
 		6FCCD49E206BD6070039903F /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FCCD49D206BD6070039903F /* CoreVideo.framework */; };
-		6FE3B6CA206CF14B0062187F /* gl-test-renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6FE3B6C8206CF14B0062187F /* gl-test-renderer.mm */; };
-		6FE3B6CC206CF9260062187F /* gl-renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6FE3B6CB206CF9260062187F /* gl-renderer.mm */; };
 		E9C967D3137B516200C6D18B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C967D2137B516200C6D18B /* Cocoa.framework */; };
 		E9C967DD137B516200C6D18B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E9C967DB137B516200C6D18B /* InfoPlist.strings */; };
 		E9C967DF137B516200C6D18B /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = E9C967DE137B516200C6D18B /* main.mm */; };
@@ -31,25 +31,25 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2FC9301C139D85A500DA0D4F /* utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utilities.h; sourceTree = "<group>"; };
-		2FC9301D139D85A500DA0D4F /* utilities.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = utilities.mm; sourceTree = "<group>"; };
 		2FC93020139D875D00DA0D4F /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		2FC93024139D8CC500DA0D4F /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		6F2F32A9206BDB4400BA10DA /* gl-test-renderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "gl-test-renderer.h"; sourceTree = "<group>"; };
-		6F2F32AA206BDB4400BA10DA /* gl-cam-renderer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "gl-cam-renderer.mm"; sourceTree = "<group>"; };
+		6F1CE0192073F99000852EC1 /* gl-cam-renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "gl-cam-renderer.h"; sourceTree = "<group>"; };
+		6F1CE01A2073F99000852EC1 /* gl-test-renderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "gl-test-renderer.cpp"; sourceTree = "<group>"; };
+		6F1CE01B2073F99000852EC1 /* gl-test-renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "gl-test-renderer.h"; sourceTree = "<group>"; };
+		6F1CE01C2073F99000852EC1 /* gl-cam-renderer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "gl-cam-renderer.mm"; sourceTree = "<group>"; };
+		6F1CE01F2073F99000852EC1 /* gl-mac-app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "gl-mac-app.h"; sourceTree = "<group>"; };
+		6F1CE0202073F99000852EC1 /* gl-app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "gl-app.cpp"; sourceTree = "<group>"; };
+		6F1CE0222073F99000852EC1 /* test.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = test.fsh; sourceTree = "<group>"; };
+		6F1CE0232073F99000852EC1 /* cam.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = cam.vsh; sourceTree = "<group>"; };
+		6F1CE0242073F99000852EC1 /* test.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = test.vsh; sourceTree = "<group>"; };
+		6F1CE0252073F99000852EC1 /* cam.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = cam.fsh; sourceTree = "<group>"; };
+		6F1CE0262073F99000852EC1 /* gl-app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "gl-app.h"; sourceTree = "<group>"; };
+		6F1CE0272073F99000852EC1 /* gl-mac-app.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "gl-mac-app.mm"; sourceTree = "<group>"; };
 		6F2F32AC206BDC3C00BA10DA /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		6F2F32AE206BE2EF00BA10DA /* cam.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = cam.fsh; sourceTree = "<group>"; };
-		6F2F32AF206BE2EF00BA10DA /* cam.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = cam.vsh; sourceTree = "<group>"; };
 		6F2F32B2206BF40500BA10DA /* mac-gl-view.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "mac-gl-view.mm"; sourceTree = "<group>"; };
 		6F2F32B3206BF40500BA10DA /* mac-gl-view.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mac-gl-view.h"; sourceTree = "<group>"; };
-		6F2F32B5206BF4B800BA10DA /* gl-renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "gl-renderer.h"; sourceTree = "<group>"; };
-		6FADACA7206D170300E8B07E /* test.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = test.fsh; sourceTree = "<group>"; };
-		6FADACA8206D170300E8B07E /* test.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = test.vsh; sourceTree = "<group>"; };
 		6FADACAB206D37FE00E8B07E /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		6FCCD49D206BD6070039903F /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
-		6FE3B6C8206CF14B0062187F /* gl-test-renderer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "gl-test-renderer.mm"; sourceTree = "<group>"; };
-		6FE3B6C9206CF14B0062187F /* gl-cam-renderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "gl-cam-renderer.h"; sourceTree = "<group>"; };
-		6FE3B6CB206CF9260062187F /* gl-renderer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "gl-renderer.mm"; sourceTree = "<group>"; };
 		E9C967CE137B516200C6D18B /* mac-cam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mac-cam.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9C967D2137B516200C6D18B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E9C967DA137B516200C6D18B /* mac-cam-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "mac-cam-info.plist"; sourceTree = "<group>"; };
@@ -81,31 +81,55 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6F1CE0172073F99000852EC1 /* gl-app */ = {
+			isa = PBXGroup;
+			children = (
+				6F1CE0182073F99000852EC1 /* renderers */,
+				6F1CE01F2073F99000852EC1 /* gl-mac-app.h */,
+				6F1CE0202073F99000852EC1 /* gl-app.cpp */,
+				6F1CE0212073F99000852EC1 /* shaders */,
+				6F1CE0262073F99000852EC1 /* gl-app.h */,
+				6F1CE0272073F99000852EC1 /* gl-mac-app.mm */,
+			);
+			path = "gl-app";
+			sourceTree = "<group>";
+		};
+		6F1CE0182073F99000852EC1 /* renderers */ = {
+			isa = PBXGroup;
+			children = (
+				6F1CE0192073F99000852EC1 /* gl-cam-renderer.h */,
+				6F1CE01A2073F99000852EC1 /* gl-test-renderer.cpp */,
+				6F1CE01B2073F99000852EC1 /* gl-test-renderer.h */,
+				6F1CE01C2073F99000852EC1 /* gl-cam-renderer.mm */,
+			);
+			path = renderers;
+			sourceTree = "<group>";
+		};
+		6F1CE0212073F99000852EC1 /* shaders */ = {
+			isa = PBXGroup;
+			children = (
+				6F1CE0222073F99000852EC1 /* test.fsh */,
+				6F1CE0232073F99000852EC1 /* cam.vsh */,
+				6F1CE0242073F99000852EC1 /* test.vsh */,
+				6F1CE0252073F99000852EC1 /* cam.fsh */,
+			);
+			path = shaders;
+			sourceTree = "<group>";
+		};
 		E9C967C3137B516100C6D18B = {
 			isa = PBXGroup;
 			children = (
+				6F1CE0172073F99000852EC1 /* gl-app */,
 				6F2F32B3206BF40500BA10DA /* mac-gl-view.h */,
 				6F2F32B2206BF40500BA10DA /* mac-gl-view.mm */,
-				6F2F32B5206BF4B800BA10DA /* gl-renderer.h */,
-				6FE3B6CB206CF9260062187F /* gl-renderer.mm */,
-				6F2F32A9206BDB4400BA10DA /* gl-test-renderer.h */,
-				6FE3B6C8206CF14B0062187F /* gl-test-renderer.mm */,
-				6FE3B6C9206CF14B0062187F /* gl-cam-renderer.h */,
-				6F2F32AA206BDB4400BA10DA /* gl-cam-renderer.mm */,
 				E9C967E4137B516200C6D18B /* mac-cam.h */,
 				E9C967E5137B516200C6D18B /* mac-cam.mm */,
-				2FC9301C139D85A500DA0D4F /* utilities.h */,
-				2FC9301D139D85A500DA0D4F /* utilities.mm */,
 				E9C967DE137B516200C6D18B /* main.mm */,
 				E9C967E0137B516200C6D18B /* mac-cam-prefix.pch */,
 				E9C967DA137B516200C6D18B /* mac-cam-info.plist */,
 				E9C967E7137B516200C6D18B /* window.xib */,
 				E9C967EA137B516200C6D18B /* menu.xib */,
 				E9C967DB137B516200C6D18B /* InfoPlist.strings */,
-				6F2F32AE206BE2EF00BA10DA /* cam.fsh */,
-				6F2F32AF206BE2EF00BA10DA /* cam.vsh */,
-				6FADACA7206D170300E8B07E /* test.fsh */,
-				6FADACA8206D170300E8B07E /* test.vsh */,
 				E9C967D1137B516200C6D18B /* Frameworks */,
 				E9C967CF137B516200C6D18B /* Products */,
 			);
@@ -186,10 +210,10 @@
 				E9C967DD137B516200C6D18B /* InfoPlist.strings in Resources */,
 				E9C967E9137B516200C6D18B /* window.xib in Resources */,
 				E9C967EC137B516200C6D18B /* menu.xib in Resources */,
-				6F2F32B1206BE2F000BA10DA /* cam.vsh in Resources */,
-				6F2F32B0206BE2F000BA10DA /* cam.fsh in Resources */,
-				6FADACAA206D170300E8B07E /* test.vsh in Resources */,
-				6FADACA9206D170300E8B07E /* test.fsh in Resources */,
+				6F1CE02D2073F99000852EC1 /* test.fsh in Resources */,
+				6F1CE02F2073F99000852EC1 /* test.vsh in Resources */,
+				6F1CE02E2073F99000852EC1 /* cam.vsh in Resources */,
+				6F1CE0302073F99000852EC1 /* cam.fsh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,12 +225,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9C967DF137B516200C6D18B /* main.mm in Sources */,
+				6F1CE0282073F99000852EC1 /* gl-test-renderer.cpp in Sources */,
 				E9C967E6137B516200C6D18B /* mac-cam.mm in Sources */,
-				2FC9301E139D85A500DA0D4F /* utilities.mm in Sources */,
-				6FE3B6CC206CF9260062187F /* gl-renderer.mm in Sources */,
-				6F2F32AB206BDB4400BA10DA /* gl-cam-renderer.mm in Sources */,
+				6F1CE0292073F99000852EC1 /* gl-cam-renderer.mm in Sources */,
+				6F1CE0312073F99000852EC1 /* gl-mac-app.mm in Sources */,
+				6F1CE02C2073F99000852EC1 /* gl-app.cpp in Sources */,
 				6F2F32B4206BF40500BA10DA /* mac-gl-view.mm in Sources */,
-				6FE3B6CA206CF14B0062187F /* gl-test-renderer.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

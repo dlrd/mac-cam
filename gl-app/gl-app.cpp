@@ -9,7 +9,7 @@ glSingleShaderSource (GLuint shader, GLchar* src, GLint len = 0)
     glShaderSource(shader, 1, &src, len ? &len : nullptr);
 }
 
-bool
+inline bool
 readBinaryFile (const char* path, std::vector<char>& contents)
 {
     std::ifstream file(path, std::ios::binary | std::ios::ate);
@@ -33,19 +33,7 @@ const char* shaderExtension (GLenum type)
     }
 }
 
-#if GL_MAC_APP
-GLuint
-compileShaderResource (GLenum type, const char* path)
-{
-    return compileShaderFile(
-        type,
-        [[NSBundle mainBundle]
-            pathForResource:[NSString stringWithUTF8String: name]
-            ofType: [NSString stringWithUTF8String: shaderExtension(type)]
-        ].UTF8String
-    );
-}
-#else
+#if !GL_MAC_APP
 GLuint
 compileShaderResource (GLenum type, const char* path)
 {
