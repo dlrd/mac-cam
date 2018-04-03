@@ -1,22 +1,18 @@
 #pragma once
 
-#import <Foundation/Foundation.h>
-#import <AVFoundation/AVFoundation.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 
-double toSeconds (uint64_t mach_host_time);
-double toHostSeconds (CVTimeStamp t);
-
-@interface AVCaptureDeviceFormat (AVRecorderAdditions)
-
-@property (readonly) NSString *localizedName;
-
-@end
-
-@interface AVFrameRateRange (AVRecorderAdditions)
-
-@property (readonly) NSString *localizedName;
-
-@end
+#if GL_MAC_APP
+#   include <OpenGL/OpenGL.h>
+#   include <OpenGL/gl3.h>
+#else
+#   define GLFW_INCLUDE_GLCOREARB 1
+#   define GLFW_INCLUDE_GLEXT 1
+#   define GL_GLEXT_PROTOTYPES
+#   include <GLFW/glfw3.h>
+#endif
 
 typedef struct
 {
@@ -39,13 +35,21 @@ typedef struct
     Colour colour;
 } Vertex;
 
+#if GL_MAC_APP
+#   define kFailedToInitialiseGLException @"Failed to initialise OpenGL"
+#   define GL_REPORT_FAILURE(...) \
+[NSException raise:kFailedToInitialiseGLException format:@__VA_ARGS__];
+#else
+#   define GL_REPORT_FAILURE(...) \
+    { printf(__VA_ARGS__); fflush(stdout); abort(); }
+#endif
 
 #if DEBUG && !defined(NDEBUG)
 
 #include <cstdlib>
 #include <cassert>
 
-#define GL_GET_ERROR( )\
+#define GL_GET_ERROR()\
         {\
             for ( GLenum Error = glGetError( ); ( GL_NO_ERROR != Error ); Error = glGetError( ) )\
             {\
@@ -60,7 +64,7 @@ typedef struct
             }\
         }
 
-#define GL_CHECK_FRAMEBUFFER_STATUS( )\
+#define GL_CHECK_FRAMEBUFFER_STATUS()\
         {\
             switch ( glCheckFramebufferStatus( GL_FRAMEBUFFER ) )\
             {\
@@ -75,7 +79,7 @@ typedef struct
             }\
         }
 
-#define GL_GET_SHADER_INFO_LOG( Shader, Source )\
+#define GL_GET_SHADER_INFO_LOG(Shader, Source)\
         {\
             GLint   Status, Count;\
             GLchar *Error;\
@@ -99,9 +103,31 @@ typedef struct
             }\
         }
 #else
-#   define GL_GET_ERROR( )
-#   define GL_CHECK_FRAMEBUFFER_STATUS( )
-#   define GL_GET_SHADER_INFO_LOG( Shader, Source )
+#   define GL_GET_ERROR()
+#   define GL_CHECK_FRAMEBUFFER_STATUS()
+#   define GL_GET_SHADER_INFO_LOG(Shader, Source)
 #endif
 
+#if GL_MAC_APP
+#   include <OpenGL/OpenGL.h>
+#   include <CoreVideo/CoreVideo.h>
+#else
+#   define CVTimeStamp double
+#   define CVReturn void
+#endif
 
+void  validateProgram (GLuint program);
+void   linkProgram (GLuint program);
+GLuint compileShaderResource (GLenum type, const char* path);
+GLuint compileShaderFile (GLenum type, const char* path);
+
+struct GLRenderer
+{
+    virtual ~GLRenderer () {}
+
+    virtual void initWithDefaultFBO (GLuint defaultFBOName) = 0;
+    virtual void             resize (GLuint width, GLuint height) = 0;
+    virtual CVReturn renderForTime (CVTimeStamp time) = 0;
+    virtual GLuint   defaultFBOName () = 0;
+    virtual void     destroyGL () = 0;
+};

@@ -1,4 +1,4 @@
-#import "utilities.h"
+#import "gl-mac-app.h"
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 #include <unistd.h>

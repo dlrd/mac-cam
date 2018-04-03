@@ -1,6 +1,6 @@
 #pragma once
 
-#import "gl-renderer.h"
+#include "../gl-app.h"
 
 struct GLTestRenderer : GLRenderer
 {

@@ -1,8 +1,4 @@
-#import "gl-test-renderer.h"
-#import <OpenGL/gl3.h>
-#import "utilities.h"
-
-#define kFailedToInitialiseGLException @"Failed to initialise OpenGL"
+#include "gl-test-renderer.h"
 
 void
 GLTestRenderer::initWithDefaultFBO (GLuint defaultFBOName)
@@ -35,8 +31,8 @@ GLTestRenderer::loadShader ()
     GLuint vertexShader;
     GLuint fragmentShader;
     
-    vertexShader   = compileShaderOfType(GL_VERTEX_SHADER  , [[NSBundle mainBundle] pathForResource:@"test" ofType:@"vsh"].UTF8String);
-    fragmentShader = compileShaderOfType(GL_FRAGMENT_SHADER, [[NSBundle mainBundle] pathForResource:@"test" ofType:@"fsh"].UTF8String);
+    vertexShader   = compileShaderResource(GL_VERTEX_SHADER  , "test");
+    fragmentShader = compileShaderResource(GL_FRAGMENT_SHADER, "test");
     
     if (0 != vertexShader && 0 != fragmentShader)
     {
@@ -56,21 +52,21 @@ GLTestRenderer::loadShader ()
         GL_GET_ERROR();
         if (u_origin < 0)
         {
-            [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'origin' uniform."];
+            GL_REPORT_FAILURE("Shader did not contain the 'origin' uniform.");
         }
 
         in_color = glGetAttribLocation(shaderProgram, "in_color");
         GL_GET_ERROR();
         if (in_color < 0)
         {
-            [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'color' attribute."];
+            GL_REPORT_FAILURE("Shader did not contain the 'color' attribute.");
         }
 
         in_position = glGetAttribLocation(shaderProgram, "in_position");
         GL_GET_ERROR();
         if (in_position < 0)
         {
-            [NSException raise:kFailedToInitialiseGLException format:@"Shader did not contain the 'position' attribute."];
+            GL_REPORT_FAILURE("Shader did not contain the 'position' attribute.");
         }
         
         glDeleteShader(vertexShader  );
@@ -80,7 +76,7 @@ GLTestRenderer::loadShader ()
     }
     else
     {
-        [NSException raise:kFailedToInitialiseGLException format:@"Shader compilation failed."];
+        GL_REPORT_FAILURE("Shader compilation failed.");
     }
 }
 
@@ -136,17 +132,21 @@ GLTestRenderer::renderForTime (CVTimeStamp time)
     glClear(GL_COLOR_BUFFER_BIT);
     GL_GET_ERROR();
     
+#if GL_MAC_APP
     GLfloat timeValue = GLfloat(M_PI * toHostSeconds(time));
 
     Vector2 p = { .x = 0.5f * sinf(timeValue), .y = 0.5f * cosf(timeValue) };
 
     glUniform2fv(u_origin, 1, (const GLfloat *)&p);
     GL_GET_ERROR();
+#endif
 
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     GL_GET_ERROR();
     
+#if GL_MAC_APP
     return kCVReturnSuccess;
+#endif
 }
 
 GLuint
