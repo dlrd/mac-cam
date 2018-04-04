@@ -1,6 +1,6 @@
 #version 150
 
-const bool wandering = true;
+const bool wandering = false;
 
 uniform vec2          u_resolution;
 uniform float         u_time;
