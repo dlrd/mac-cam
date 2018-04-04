@@ -321,7 +321,7 @@ struct CameraCapture::That
         auto framerate = findFramerate(device, format, cxx->that->settings.framerate);
 
         device.activeVideoMinFrameDuration = framerate.minFrameDuration;
-        device.activeVideoMaxFrameDuration = framerate.maxFrameDuration;
+        device.activeVideoMaxFrameDuration = framerate.minFrameDuration;
 
         self.device = device;
 
