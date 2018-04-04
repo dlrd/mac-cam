@@ -2,6 +2,8 @@
 
 const bool yFlipped = true;
 const bool xFlipped = false;
+const bool rainbow = false;
+const float rainbowOpacity = 0.25;
 
 uniform sampler2DRect u_frame;
 
@@ -17,5 +19,7 @@ void main(void)
         float(yFlipped) * (-2 * var_uv.t + 1)
     );
 
-    out_rgba = 0.25 *  var_color + 0.75 * texture(u_frame, uv * textureSize(u_frame));
+    out_rgba = texture(u_frame, uv * textureSize(u_frame)) * 1.0 - float(rainbow) * rainbowOpacity
+        + var_color * vec4(float(rainbow) * rainbowOpacity)
+        ;
 }
