@@ -4,6 +4,17 @@
 #import <OpenGL/OpenGL.h>
 #import "gl-mac-app.h" // FIXME: Remove this.
 
+//------------------------------------------------------------------------------
+
+// TODO: Proper error reporting.
+
+//------------------------------------------------------------------------------
+
+using STR  = CameraCapture::String;
+using STRS = CameraCapture::Strings;
+
+//------------------------------------------------------------------------------
+
 static NSArray* allSessionPresets = @[
     AVCaptureSessionPresetLow,
     AVCaptureSessionPresetMedium,
@@ -19,11 +30,70 @@ static NSArray* allSessionPresets = @[
 //------------------------------------------------------------------------------
 
 inline void
-debugStrings (const CameraCapture::Strings& strings, const char* prefix = "")
+debugStrings (const STRS& strings, const char* prefix = "")
 {
     for (auto s : strings)
         printf("%s%s\n", prefix, s.data());
 }
+
+inline AVCaptureDevice*
+findDevice (const STR& name)
+{
+    for (AVCaptureDevice* device in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo])
+        if (name == device.localizedName.UTF8String)
+            return device;
+
+    return nil;
+}
+
+inline AVCaptureDeviceFormat*
+findFormat (AVCaptureDevice* device, const STR& formatName)
+{
+    if (!device)
+        return nil;
+
+    for (AVCaptureDeviceFormat* format in device.formats)
+        if (formatName == format.localizedName.UTF8String)
+            return format;
+
+    return nil;
+}
+
+using DeviceAndFormat = std::pair<AVCaptureDevice*, AVCaptureDeviceFormat*>;
+
+inline DeviceAndFormat
+findDeviceAndFormat (const STR& deviceName, const STR& formatName)
+{
+    auto device = findDevice(deviceName);
+    auto format = findFormat(device, formatName);
+
+    return DeviceAndFormat(device, format);
+}
+
+inline AVFrameRateRange*
+findFramerate (AVCaptureDevice* device, AVCaptureDeviceFormat* format, const STR& framerateName)
+{
+    if (!device || !format)
+        return nil;
+    
+    for (AVFrameRateRange* framerate in format.videoSupportedFrameRateRanges)
+        if (framerateName == framerate.localizedName.UTF8String)
+            return framerate;
+    
+    return nil;
+}
+
+inline AVFrameRateRange*
+findFramerate (const DeviceAndFormat& deviceAndFormat, const STR& framerateName)
+{
+    return findFramerate(deviceAndFormat.first, deviceAndFormat.second, framerateName);
+}
+
+//inline AVCaptureSessionPreset*
+//findPreset (const STR& presetName)
+//{
+//
+//}
 
 inline OSType
 toCVPixelFormatType (CameraCapture::TextureType from)
@@ -134,11 +204,12 @@ CameraCapture::Frame::~Frame ()
 }
 
 @property (strong)        AVCaptureSession*         session;
-@property (strong)        NSArray*                  observers;
-@property (strong)        AVCaptureDeviceInput*     videoDeviceInput;
 @property (strong)        AVCaptureVideoDataOutput* videoOutput;
-@property (strong) CF_ARC dispatch_queue_t          cameraOutputQueue;
+@property (strong)        NSOperationQueue*         messageQueue;
+@property (strong) CF_ARC dispatch_queue_t          outputQueue;
+@property (strong)        NSArray*                  observers;
 @property (strong) CF_ARC CVOpenGLTextureCacheRef   videoTextureCache;
+@property (strong)        AVCaptureDeviceInput*     videoDeviceInput;
 @property (strong)        NSArray*                  videoDevices;
 @property (readonly)      NSArray*                  availableSessionPresets;
 @property (assign)        AVCaptureDevice*          selectedVideoDevice;
@@ -149,6 +220,14 @@ CameraCapture::Frame::~Frame ()
 
 //------------------------------------------------------------------------------
 
+struct CameraCapture::That
+{
+    Settings            settings;
+    objc_CameraCapture* objc     = [[objc_CameraCapture alloc] init];
+};
+
+//------------------------------------------------------------------------------
+
 @implementation objc_CameraCapture
 
 - (void) presentError:(NSError*) error
@@ -156,16 +235,29 @@ CameraCapture::Frame::~Frame ()
     // FIXME: Implement.
 }
 
-- (void) setupCapture
+- (id) init
 {
-    _session = [[AVCaptureSession alloc] init];
+    if (!(self = [super init]))
+        return nil;
 
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    _session     = [[AVCaptureSession         alloc] init];
+    _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
+
+    _outputQueue  = dispatch_queue_create("mac-cam.frames"  , DISPATCH_QUEUE_SERIAL);
+
+    [_videoOutput setSampleBufferDelegate:self queue:_outputQueue];
+
+    [_session addOutput:_videoOutput];
+
+    NSNotificationCenter* notificationCenter = [NSNotificationCenter defaultCenter];
+
+    _messageQueue = [[NSOperationQueue alloc] init];
+    _messageQueue.underlyingQueue = dispatch_queue_create("mac-cam.messages", DISPATCH_QUEUE_SERIAL);
 
     _observers = @[
         [notificationCenter addObserverForName:AVCaptureSessionRuntimeErrorNotification
             object: _session
-            queue: [NSOperationQueue mainQueue]
+            queue: _messageQueue
             usingBlock: ^(NSNotification *note) {
                 dispatch_async(dispatch_get_main_queue(), ^(void) {
                     [self presentError:[[note userInfo] objectForKey:AVCaptureSessionErrorKey]];
@@ -174,38 +266,46 @@ CameraCapture::Frame::~Frame ()
         ],
         [notificationCenter addObserverForName:AVCaptureSessionDidStartRunningNotification
             object: _session
-            queue: [NSOperationQueue mainQueue]
+            queue: _messageQueue
             usingBlock: ^(NSNotification *note) {
                 NSLog(@"Capture session started.");
             }
         ],
         [notificationCenter addObserverForName:AVCaptureSessionDidStopRunningNotification
             object: _session
-            queue: [NSOperationQueue mainQueue]
+            queue: _messageQueue
             usingBlock: ^(NSNotification *note) {
                 NSLog(@"Capture session stopped.");
             }
         ],
         [notificationCenter addObserverForName:AVCaptureDeviceWasConnectedNotification
             object:nil
-            queue:[NSOperationQueue mainQueue]
+            queue:_messageQueue
             usingBlock:^(NSNotification *note) {
                 [self refreshDevices];
             }
         ],
         [notificationCenter addObserverForName:AVCaptureDeviceWasDisconnectedNotification
             object:nil
-            queue:[NSOperationQueue mainQueue]
+            queue:_messageQueue
             usingBlock:^(NSNotification *note) {
                 [self refreshDevices];
             }
         ]
     ];
 
-    _cameraOutputQueue = dispatch_queue_create("CameraOutputQueue", DISPATCH_QUEUE_SERIAL);
+    return self;
+}
 
-    _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
-    [_videoOutput setSampleBufferDelegate:self queue:_cameraOutputQueue];
+- (void) dealloc
+{
+    for (id observer in self.observers)
+        [[NSNotificationCenter defaultCenter] removeObserver:observer];
+}
+
+- (void) setupCapture
+{
+    // _session.sessionPreset = [NSString stringWithUTF8String: findPreset(cxx->that->settings.preset)];
 
     _videoOutput.videoSettings = @{
         (NSString*)kCVPixelBufferPixelFormatTypeKey : @(toCVPixelFormatType(cxx->delegate.textureType)),
@@ -213,15 +313,28 @@ CameraCapture::Frame::~Frame ()
         (NSString*)kCVPixelBufferIOSurfacePropertiesKey : @{},
     };
 
-    [_session addOutput:_videoOutput];
+    auto device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 
-    AVCaptureDevice *videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-    if (videoDevice)
-        self.selectedVideoDevice = videoDevice;
-    else
-        self.selectedVideoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeMuxed];
+    device = findDevice(cxx->that->settings.device);
+    
+    if (device)
+    {
+        [device lockForConfiguration:nil];
+    
+        auto format = findFormat(device, cxx->that->settings.format);
 
-    // Initial refresh of device list
+        device.activeFormat = format;
+        
+        auto framerate = findFramerate(device, format, cxx->that->settings.framerate);
+
+        device.activeVideoMinFrameDuration = framerate.minFrameDuration;
+        device.activeVideoMaxFrameDuration = framerate.maxFrameDuration;
+
+        self.selectedVideoDevice = device;
+
+        [device unlockForConfiguration];
+    }
+
     [self refreshDevices];
 }
 
@@ -232,25 +345,7 @@ CameraCapture::Frame::~Frame ()
 
 - (void) stopCapture
 {
-    // Stop the session
     [self.session stopRunning];
-    
-    // Remove Observers
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    for (id observer in [self observers])
-        [notificationCenter removeObserver:observer];
-}
-
-- (void)refreshDevices
-{
-    self.videoDevices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-    
-    [_session beginConfiguration];
-    
-    if (![self.videoDevices containsObject:self.selectedVideoDevice])
-        self.selectedVideoDevice = nil;
-        
-    [_session commitConfiguration];
 }
 
 - (AVCaptureDevice *)selectedVideoDevice
@@ -290,10 +385,22 @@ CameraCapture::Frame::~Frame ()
     [_session commitConfiguration];
 }
 
-//+ (NSSet *)keyPathsForValuesAffectingVideoDeviceFormat
-//{
-//    return [NSSet setWithObjects: @"selectedVideoDevice.activeFormat", nil];
-//}
+- (void)refreshDevices
+{
+    self.videoDevices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    
+    [_session beginConfiguration];
+    
+    if (![self.videoDevices containsObject:self.selectedVideoDevice])
+        self.selectedVideoDevice = nil;
+    
+    [_session commitConfiguration];
+}
+
++ (NSSet *)keyPathsForValuesAffectingVideoDeviceFormat
+{
+    return [NSSet setWithObjects: @"selectedVideoDevice.activeFormat", nil];
+}
 
 - (AVCaptureDeviceFormat *)videoDeviceFormat
 {
@@ -341,6 +448,7 @@ CameraCapture::Frame::~Frame ()
     {
         if ([self.selectedVideoDevice lockForConfiguration:&error]) {
             [self.selectedVideoDevice setActiveVideoMinFrameDuration:frameRateRange.minFrameDuration];
+            [self.selectedVideoDevice setActiveVideoMaxFrameDuration:frameRateRange.maxFrameDuration];
             [self.selectedVideoDevice unlockForConfiguration];
         } else {
             dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -357,7 +465,7 @@ CameraCapture::Frame::~Frame ()
 
 - (NSArray *)availableSessionPresets
 {
-    NSMutableArray *availableSessionPresets = [NSMutableArray arrayWithCapacity:9];
+    NSMutableArray *availableSessionPresets = [NSMutableArray arrayWithCapacity:allSessionPresets.count];
     for (NSString *sessionPreset in allSessionPresets) {
         if ([_session canSetSessionPreset:sessionPreset])
             [availableSessionPresets addObject:sessionPreset];
@@ -444,12 +552,6 @@ CameraCapture::Frame::~Frame ()
 
 //------------------------------------------------------------------------------
 
-struct CameraCapture::That
-{
-    Settings            settings;
-    objc_CameraCapture* objc     = [[objc_CameraCapture alloc] init];
-};
-
 CameraCapture::CameraCapture ()
     : that(new That())
 {
@@ -461,36 +563,8 @@ CameraCapture::~CameraCapture ()
     delete that;
 }
 
-inline AVCaptureDevice*
-findDevice (CameraCapture::String name)
-{
-    for (AVCaptureDevice* device in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo])
-        if (name == device.localizedName.UTF8String)
-            return device;
-
-    return nil;
-}
-
-using DeviceAndFormat = std::pair<AVCaptureDevice*, AVCaptureDeviceFormat*>;
-
-inline DeviceAndFormat
-findDeviceAndFormat (CameraCapture::String deviceName, CameraCapture::String formatName)
-{
-    for (AVCaptureDevice* device in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo])
-    {
-        if (deviceName != device.localizedName.UTF8String)
-            continue;
-
-        for (AVCaptureDeviceFormat* format in device.formats)
-            if (formatName == format.localizedName.UTF8String)
-                return DeviceAndFormat(device, format);
-    }
-    
-    return DeviceAndFormat(nil, nil);
-}
-
-CameraCapture::Strings
-CameraCapture::cameraNames ()
+STRS
+CameraCapture::queryDevices ()
 {
     Strings ret;
 
@@ -500,8 +574,40 @@ CameraCapture::cameraNames ()
     return ret;
 }
 
-CameraCapture::Strings
-CameraCapture::cameraPresets (String cameraName)
+STRS
+CameraCapture::queryFormats (String cameraName)
+{
+    Strings ret;
+    
+    AVCaptureDevice* device = findDevice(cameraName);
+
+    if (!device)
+        return ret;
+
+    for (AVCaptureDeviceFormat* format in device.formats)
+        ret.emplace_back(format.localizedName.UTF8String);
+
+    return ret;
+}
+
+STRS
+CameraCapture::queryFramerates (String cameraName, String resolutionName)
+{
+    Strings ret;
+    
+    DeviceAndFormat deviceAndFormat = findDeviceAndFormat(cameraName, resolutionName);
+ 
+    if (!deviceAndFormat.first || !deviceAndFormat.second)
+        return ret;
+
+    for (AVFrameRateRange* framerate in deviceAndFormat.second.videoSupportedFrameRateRanges)
+        ret.emplace_back(framerate.localizedName.UTF8String);
+    
+    return ret;
+}
+
+STRS
+CameraCapture::queryPresets (String cameraName)
 {
     Strings ret;
 
@@ -521,60 +627,70 @@ CameraCapture::cameraPresets (String cameraName)
     return ret;
 }
 
-CameraCapture::Strings
-CameraCapture::cameraResolutions (String cameraName)
+CameraCapture::Settings
+CameraCapture::defaults ()
 {
-    Strings ret;
-    
-    AVCaptureDevice* device = findDevice(cameraName);
+    Settings ret;
 
-    if (!device)
+    Strings devices = queryDevices();
+    
+    if (devices.empty())
         return ret;
 
-    for (AVCaptureDeviceFormat* format in device.formats)
-        ret.emplace_back(format.localizedName.UTF8String);
+    ret.device = devices.front();
+    
+    Strings formats = queryFormats(ret.device);
+
+    if (formats.empty())
+        return ret;
+    
+    ret.format = formats.back();
+
+    Strings framerates = queryFramerates(ret.device, ret.format);
+
+    if (framerates.empty())
+        return ret;
+
+    ret.framerate = framerates.front();
+
+    Strings presets = queryPresets(ret.device);
+
+    if (presets.empty())
+        return ret;
+
+    ret.preset = presets.back();
 
     return ret;
 }
 
-CameraCapture::Strings
-CameraCapture::cameraFramerates (String cameraName, String resolutionName)
+const CameraCapture::Settings&
+CameraCapture::settings ()
 {
-    Strings ret;
-    
-    DeviceAndFormat deviceAndFormat = findDeviceAndFormat(cameraName, resolutionName);
- 
-    if (!deviceAndFormat.first || !deviceAndFormat.second)
-        return ret;
-
-    for (AVFrameRateRange* framerate in deviceAndFormat.second.videoSupportedFrameRateRanges)
-        ret.emplace_back(framerate.localizedName.UTF8String);
-    
-    return ret;
+    return that->settings;
 }
 
 void
 CameraCapture::setup (const Settings& settings)
 {
-    Strings deviceNames = cameraNames();
+    Strings devices = queryDevices();
 
 #if DEBUG
-    debugStrings(deviceNames, "Device: ");
+    debugStrings(devices, "Device: ");
 
-    for (auto cameraName : deviceNames)
+    for (auto device : devices)
     {
-        Strings presets     = cameraPresets(cameraName);
-        debugStrings(presets, "Preset: ");
+        Strings formats = queryFormats(device);
+        debugStrings(formats, "Format: ");
 
-        Strings resolutions = cameraResolutions(cameraName);
-        debugStrings(resolutions, "Resolution: ");
-
-        for (String resolutionName : resolutions)
+        for (String format : formats)
         {
-            Strings framerates = cameraFramerates(cameraName, resolutionName);
+            Strings framerates = queryFramerates(device, format);
 
-            debugStrings(framerates, (String("Framerate (") + resolutionName + "): ").data());
+            debugStrings(framerates, (String("Framerate (") + format + "): ").data());
         }
+
+        Strings presets = queryPresets(device);
+        debugStrings(presets, "Preset: ");
     }
 #endif
 

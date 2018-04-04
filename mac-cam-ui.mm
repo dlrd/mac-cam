@@ -4,12 +4,6 @@
 
 //------------------------------------------------------------------------------
 
-
-@interface AVCaptureDocument ()
-@end
-
-//------------------------------------------------------------------------------
-
 @implementation AVCaptureDocument
 {
     CameraCapture cameraCapture;
@@ -19,8 +13,6 @@
 {
     [super windowControllerDidLoadNib:aController];
 
-    CameraCapture::Settings settings;
-    
     self->cameraCapture.delegate.cameraFrameWasCaptured = [self] (CameraCapture::FramePtr frame) {
     
         self.glCamView.cameraFrame = frame;
@@ -32,6 +24,10 @@
         [self.glCamView.openGLContext makeCurrentContext];
     
     };
+
+    self->cameraCapture.delegate.textureType = CameraCapture::TextureType::_422YpCbCr8;
+
+    CameraCapture::Settings settings = CameraCapture::defaults();
 
     cameraCapture.setup(settings);
     

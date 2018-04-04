@@ -1,7 +1,5 @@
 #pragma once
 
-//------------------------------------------------------------------------------
-
 #include <memory>
 #include <functional>
 #include <string>
@@ -50,12 +48,6 @@ struct CameraCapture
 
     using FramePtr = std::shared_ptr<Frame>;
 
-    Strings cameraNames ();
-
-    Strings cameraPresets     (String cameraName);
-    Strings cameraResolutions (String cameraName);
-    Strings cameraFramerates  (String cameraName, String cameraResolution);
-
     struct Delegate
     {
         TextureType textureType = TextureType::_422YpCbCr8;
@@ -64,24 +56,31 @@ struct CameraCapture
         std::function<void (FramePtr)> cameraFrameWasCaptured   = [] (FramePtr) { abort(); };
     };
 
+    static Strings queryDevices ();
+    static Strings queryFormats     (String device);
+    static Strings queryFramerates  (String device, String formats);
+    static Strings queryPresets     (String device);
+
     struct Settings
     {
-        String cameraName;
-        String cameraPreset;
-        String cameraResolution;
-        String cameraFramerate;
+        String device;
+        String format;
+        String framerate;
+        String preset;
     };
 
+    static Settings defaults ();
+
     CameraCapture ();
-
-    Delegate delegate;
-
-    const Settings& currentSettings ();
 
     void  setup (const Settings& settings);
 
     void  start ();
     void  stop ();
+
+    const CameraCapture::Settings& settings ();
+
+    Delegate delegate;
 
     MAC_CAM_DECLARE_OPAQUE_INTERNALS(CameraCapture)
 };
