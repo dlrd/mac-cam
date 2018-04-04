@@ -59,14 +59,12 @@ struct CameraCapture
     static Strings queryDevices ();
     static Strings queryFormats     (String device);
     static Strings queryFramerates  (String device, String formats);
-    static Strings queryPresets     (String device);
 
     struct Settings
     {
         String device;
         String format;
         String framerate;
-        String preset;
     };
 
     static Settings defaults ();

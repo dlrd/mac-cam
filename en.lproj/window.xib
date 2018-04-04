@@ -41,8 +41,8 @@
                             </button>
                         </subviews>
                     </customView>
-                    <popUpButton verticalHuggingPriority="750" imageHugsTitle="YES" id="100387">
-                        <rect key="frame" x="62" y="502" width="149" height="22"/>
+                    <popUpButton verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="100387">
+                        <rect key="frame" x="17" y="502" width="194" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="100406">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -77,8 +77,8 @@
                             <binding destination="-2" name="selectedObject" keyPath="capture.format" previousBinding="100451" id="100460"/>
                         </connections>
                     </popUpButton>
-                    <popUpButton verticalHuggingPriority="750" imageHugsTitle="YES" id="100393">
-                        <rect key="frame" x="446" y="502" width="158" height="22"/>
+                    <popUpButton verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="100393">
+                        <rect key="frame" x="446" y="502" width="177" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="100394">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -86,46 +86,15 @@
                             <menu key="menu" title="OtherViews" id="100395"/>
                         </popUpButtonCell>
                         <connections>
-                            <binding destination="-2" name="selectedObject" keyPath="capture.framerate" previousBinding="100458" id="100464"/>
                             <binding destination="-2" name="content" keyPath="capture.device.activeFormat.videoSupportedFrameRateRanges" id="100456"/>
                             <binding destination="-2" name="contentValues" keyPath="capture.device.activeFormat.videoSupportedFrameRateRanges.localizedName" previousBinding="100456" id="100458"/>
+                            <binding destination="-2" name="selectedObject" keyPath="capture.framerate" previousBinding="100458" id="100464"/>
                         </connections>
                     </popUpButton>
-                    <textField verticalHuggingPriority="750" id="100408">
-                        <rect key="frame" x="20" y="506" width="40" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Video" id="100409">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                     <customView canDrawConcurrently="YES" misplaced="YES" id="TPz-mc-moz" customClass="OpenGLCamView">
-                        <rect key="frame" x="0.0" y="45" width="640" height="426"/>
+                        <rect key="frame" x="0.0" y="45" width="640" height="452"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     </customView>
-                    <textField verticalHuggingPriority="750" misplaced="YES" id="100465">
-                        <rect key="frame" x="18" y="480" width="43" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Preset" id="100466">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <popUpButton verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="100467">
-                        <rect key="frame" x="63" y="476" width="222" height="22"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="100468">
-                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="smallSystem"/>
-                            <menu key="menu" title="OtherViews" id="100469"/>
-                        </popUpButtonCell>
-                        <connections>
-                            <binding destination="-2" name="content" keyPath="capture.presets" id="100474"/>
-                            <binding destination="-2" name="selectedObject" keyPath="capture.session.sessionPreset" previousBinding="100474" id="100476"/>
-                        </connections>
-                    </popUpButton>
                 </subviews>
             </view>
             <connections>

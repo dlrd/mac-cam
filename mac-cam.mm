@@ -15,20 +15,6 @@ using STRS = CameraCapture::Strings;
 
 //------------------------------------------------------------------------------
 
-static NSArray* allSessionPresets = @[
-    AVCaptureSessionPresetLow,
-    AVCaptureSessionPresetMedium,
-    AVCaptureSessionPresetHigh,
-    AVCaptureSessionPreset320x240,
-    AVCaptureSessionPreset352x288,
-    AVCaptureSessionPreset640x480,
-    AVCaptureSessionPreset960x540,
-    AVCaptureSessionPreset1280x720,
-    AVCaptureSessionPresetPhoto,
-];
-
-//------------------------------------------------------------------------------
-
 inline void
 debugStrings (const STRS& strings, const char* prefix = "")
 {
@@ -211,7 +197,6 @@ CameraCapture::Frame::~Frame ()
 @property (strong) CF_ARC CVOpenGLTextureCacheRef   textureCache;
 @property (strong)        AVCaptureDeviceInput*     deviceInput;
 @property (strong)        NSArray*                  devices;
-@property (readonly)      NSArray*                  presets;
 @property (assign)        AVCaptureDevice*          device;
 @property (assign)        AVCaptureDeviceFormat*    format;
 @property (assign)        AVFrameRateRange*         framerate;
@@ -297,15 +282,10 @@ struct CameraCapture::That
     for (NSString* keyPath in @[
         @"devices",
         @"device",
-//        @"videoDevices.localizedName",
         @"device.formats",
-//        @"selectedVideoDevice.formats.localizedName",
         @"format",
         @"framerate",
         @"device.activeFormat.videoSupportedFrameRateRanges",
-//        @"selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges.localizedName",
-        @"presets",
-        @"session.sessionPreset",
     ])
         [self addObserver:self forKeyPath:keyPath options:(NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld) context:nil];
 
@@ -320,8 +300,6 @@ struct CameraCapture::That
 
 - (void) setupCapture
 {
-    // _session.sessionPreset = [NSString stringWithUTF8String: findPreset(cxx->that->settings.preset)];
-
     _videoOutput.videoSettings = @{
         (NSString*)kCVPixelBufferPixelFormatTypeKey : @(toCVPixelFormatType(cxx->delegate.textureType)),
         (NSString*)kCVPixelBufferOpenGLCompatibilityKey : @YES,
@@ -473,22 +451,6 @@ struct CameraCapture::That
     }
 }
 
-+ (NSSet *)keyPathsForValuesAffectingAvailableSessionPresets
-{
-    return [NSSet setWithObjects:@"selectedVideoDevice", nil];
-}
-
-- (NSArray *)presets
-{
-    NSMutableArray *availableSessionPresets = [NSMutableArray arrayWithCapacity:allSessionPresets.count];
-    for (NSString *sessionPreset in allSessionPresets) {
-        if ([_session canSetSessionPreset:sessionPreset])
-            [availableSessionPresets addObject:sessionPreset];
-    }
-
-    return availableSessionPresets;
-}
-
 - (void) captureOutput:(AVCaptureOutput*)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection*)connection
 {
     CMFormatDescriptionRef formatDescription = CMSampleBufferGetFormatDescription(sampleBuffer);
@@ -626,27 +588,6 @@ CameraCapture::queryFramerates (String cameraName, String resolutionName)
     return ret;
 }
 
-STRS
-CameraCapture::queryPresets (String cameraName)
-{
-    Strings ret;
-
-    AVCaptureDevice* device = findDevice(cameraName);
-
-    if (!device)
-        return ret;
-
-    for (NSString* preset in allSessionPresets)
-    {
-        if (![device supportsAVCaptureSessionPreset:preset])
-            continue;
-
-        ret.emplace_back(preset.UTF8String);
-    }
-    
-    return ret;
-}
-
 CameraCapture::Settings
 CameraCapture::defaults ()
 {
@@ -672,13 +613,6 @@ CameraCapture::defaults ()
         return ret;
 
     ret.framerate = framerates.front();
-
-    Strings presets = queryPresets(ret.device);
-
-    if (presets.empty())
-        return ret;
-
-    ret.preset = presets.back();
 
     return ret;
 }
@@ -708,9 +642,6 @@ CameraCapture::setup (const Settings& settings)
 
             debugStrings(framerates, (String("Framerate (") + format + "): ").data());
         }
-
-        Strings presets = queryPresets(device);
-        debugStrings(presets, "Preset: ");
     }
 #endif
 
