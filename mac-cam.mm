@@ -2,8 +2,28 @@
 #import <AVFoundation/AVFoundation.h>
 #import <CoreVideo/CoreVideo.h>
 #import <OpenGL/OpenGL.h>
+#import "gl-mac-app.h" // FIXME: Remove this.
+
+static NSArray* allSessionPresets = @[
+    AVCaptureSessionPresetLow,
+    AVCaptureSessionPresetMedium,
+    AVCaptureSessionPresetHigh,
+    AVCaptureSessionPreset320x240,
+    AVCaptureSessionPreset352x288,
+    AVCaptureSessionPreset640x480,
+    AVCaptureSessionPreset960x540,
+    AVCaptureSessionPreset1280x720,
+    AVCaptureSessionPresetPhoto,
+];
 
 //------------------------------------------------------------------------------
+
+inline void
+debugStrings (const CameraCapture::Strings& strings, const char* prefix = "")
+{
+    for (auto s : strings)
+        printf("%s%s\n", prefix, s.data());
+}
 
 inline OSType
 toCVPixelFormatType (CameraCapture::TextureType from)
@@ -188,7 +208,7 @@ CameraCapture::Frame::~Frame ()
     [_videoOutput setSampleBufferDelegate:self queue:_cameraOutputQueue];
 
     _videoOutput.videoSettings = @{
-        (NSString*)kCVPixelBufferPixelFormatTypeKey : @(toCVPixelFormatType(settings.cameraTextureType)),
+        (NSString*)kCVPixelBufferPixelFormatTypeKey : @(toCVPixelFormatType(settings.textureType)),
         (NSString*)kCVPixelBufferOpenGLCompatibilityKey : @YES,
         (NSString*)kCVPixelBufferIOSurfacePropertiesKey : @{},
     };
@@ -337,18 +357,6 @@ CameraCapture::Frame::~Frame ()
 
 - (NSArray *)availableSessionPresets
 {
-    NSArray *allSessionPresets = [NSArray arrayWithObjects:
-        AVCaptureSessionPresetLow,
-        AVCaptureSessionPresetMedium,
-        AVCaptureSessionPresetHigh,
-        AVCaptureSessionPreset320x240,
-        AVCaptureSessionPreset352x288,
-        AVCaptureSessionPreset640x480,
-        AVCaptureSessionPreset960x540,
-        AVCaptureSessionPreset1280x720,
-        AVCaptureSessionPresetPhoto,
-    nil];
-
     NSMutableArray *availableSessionPresets = [NSMutableArray arrayWithCapacity:9];
     for (NSString *sessionPreset in allSessionPresets) {
         if ([_session canSetSessionPreset:sessionPreset])
@@ -365,7 +373,7 @@ CameraCapture::Frame::~Frame ()
     if (kCMMediaType_Video != CMFormatDescriptionGetMediaType(formatDescription))
         return;
 
-    if (toCVPixelFormatType(settings.cameraTextureType) != CMFormatDescriptionGetMediaSubType(formatDescription))
+    if (toCVPixelFormatType(settings.textureType) != CMFormatDescriptionGetMediaSubType(formatDescription))
         return;
     
     CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
@@ -427,7 +435,7 @@ CameraCapture::Frame::~Frame ()
     settings.cameraFrameWasCaptured(frame);
 }
 
-- (void)captureOutput:(AVCaptureOutput *)output didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection NS_AVAILABLE(10_7, 6_0);
+- (void)captureOutput:(AVCaptureOutput *)output didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
 {
 
 }
@@ -452,9 +460,123 @@ CameraCapture::~CameraCapture ()
     delete that;
 }
 
+inline AVCaptureDevice*
+findDevice (CameraCapture::String name)
+{
+    for (AVCaptureDevice* device in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo])
+        if (name == device.localizedName.UTF8String)
+            return device;
+
+    return nil;
+}
+
+using DeviceAndFormat = std::pair<AVCaptureDevice*, AVCaptureDeviceFormat*>;
+
+inline DeviceAndFormat
+findDeviceAndFormat (CameraCapture::String deviceName, CameraCapture::String formatName)
+{
+    for (AVCaptureDevice* device in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo])
+    {
+        if (deviceName != device.localizedName.UTF8String)
+            continue;
+
+        for (AVCaptureDeviceFormat* format in device.formats)
+            if (formatName == format.localizedName.UTF8String)
+                return DeviceAndFormat(device, format);
+    }
+    
+    return DeviceAndFormat(nil, nil);
+}
+
+CameraCapture::Strings
+CameraCapture::cameraNames ()
+{
+    Strings ret;
+
+    for (AVCaptureDevice* device in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo])
+        ret.emplace_back(device.localizedName.UTF8String);
+
+    return ret;
+}
+
+CameraCapture::Strings
+CameraCapture::cameraPresets (String cameraName)
+{
+    Strings ret;
+
+    AVCaptureDevice* device = findDevice(cameraName);
+
+    if (!device)
+        return ret;
+
+    for (NSString* preset in allSessionPresets)
+    {
+        if (![device supportsAVCaptureSessionPreset:preset])
+            continue;
+
+        ret.emplace_back(preset.UTF8String);
+    }
+    
+    return ret;
+}
+
+CameraCapture::Strings
+CameraCapture::cameraResolutions (String cameraName)
+{
+    Strings ret;
+    
+    AVCaptureDevice* device = findDevice(cameraName);
+
+    if (!device)
+        return ret;
+
+    for (AVCaptureDeviceFormat* format in device.formats)
+        ret.emplace_back(format.localizedName.UTF8String);
+
+    return ret;
+}
+
+CameraCapture::Strings
+CameraCapture::cameraFramerates (String cameraName, String resolutionName)
+{
+    Strings ret;
+    
+    DeviceAndFormat deviceAndFormat = findDeviceAndFormat(cameraName, resolutionName);
+ 
+    if (!deviceAndFormat.first || !deviceAndFormat.second)
+        return ret;
+
+    for (AVFrameRateRange* framerate in deviceAndFormat.second.videoSupportedFrameRateRanges)
+        ret.emplace_back(framerate.localizedName.UTF8String);
+    
+    return ret;
+}
+
 void
 CameraCapture::setup (const Settings& settings)
 {
+    Strings deviceNames = cameraNames();
+
+#if DEBUG
+    debugStrings(deviceNames, "Device: ");
+
+    for (auto cameraName : deviceNames)
+    {
+        Strings presets     = cameraPresets(cameraName);
+        debugStrings(presets, "Preset: ");
+
+        Strings resolutions = cameraResolutions(cameraName);
+        debugStrings(resolutions, "Resolution: ");
+
+        for (String resolutionName : resolutions)
+        {
+            Strings framerates = cameraFramerates(cameraName, resolutionName);
+
+            debugStrings(framerates, (String("Framerate (") + resolutionName + "): ").data());
+        }
+    }
+#endif
+
     that->objc->settings = settings;
 
     [that->objc setupCapture];

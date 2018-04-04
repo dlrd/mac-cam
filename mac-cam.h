@@ -4,6 +4,8 @@
 
 #include <memory>
 #include <functional>
+#include <string>
+#include <vector>
 
 //------------------------------------------------------------------------------
 
@@ -18,6 +20,9 @@ public: \
 
 struct CameraCapture
 {
+    using Strings = std::vector<std::string>;
+    using String  = std::string;
+
     static double nowInSeconds ();
 
     enum class TextureType
@@ -45,9 +50,20 @@ struct CameraCapture
 
     using FramePtr = std::shared_ptr<Frame>;
 
+    Strings cameraNames ();
+
+    Strings cameraPresets     (String cameraName);
+    Strings cameraResolutions (String cameraName);
+    Strings cameraFramerates  (String cameraName, String cameraResolution);
+
     struct Settings
     {
-        TextureType cameraTextureType = TextureType::_422YpCbCr8;
+        String cameraName;
+        String cameraPreset;
+        String cameraResolution;
+        String cameraFramerate;
+
+        TextureType textureType = TextureType::_422YpCbCr8;
 
         std::function<void ()        > makeOpenGLContextCurrent;
         std::function<void (FramePtr)> cameraFrameWasCaptured;
