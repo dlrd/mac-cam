@@ -41,6 +41,8 @@
         self->cameraCapture.start();
 
     });
+
+    self.displayName = @"mac-cam";
 }
 
 - (void)windowWillClose:(NSNotification *)notification
