@@ -316,7 +316,7 @@ CameraCapture::Frame::~Frame ()
 
 + (NSSet *)keyPathsForValuesAffectingFrameRateRange
 {
-    return [NSSet setWithObjects:@"selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges", nil];
+    return [NSSet setWithObjects: @"selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges", nil];
 }
 
 - (AVFrameRateRange *)frameRateRange
@@ -601,3 +601,17 @@ objc (CameraCapture* cameraCapture)
 {
     return cameraCapture->that->objc;
 }
+
+//capture.selectedVideoDevice
+//capture.videoDevices>
+//capture.videoDevices.localizedName
+//capture.selectedVideoDevice.formats
+//capture.selectedVideoDevice.formats.localizedName
+//capture.videoDeviceFormat
+//capture.frameRateRange
+//capture.selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges
+//capture.selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges.localizedName
+//capture.availableSessionPresets
+//capture.session.sessionPreset
+
+
