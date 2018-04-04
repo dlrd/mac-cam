@@ -51,6 +51,11 @@
     return @"window";
 }
 
+- (IBAction)start:(id)sender
+{
+    cameraCapture.start();
+}
+
 - (IBAction)stop:(id)sender
 {
     cameraCapture.stop();

@@ -11,6 +11,7 @@
 
 @property (assign) IBOutlet OpenGLCamView *glCamView;
 
+- (IBAction)start:(id)sender;
 - (IBAction)stop:(id)sender;
 
 @end

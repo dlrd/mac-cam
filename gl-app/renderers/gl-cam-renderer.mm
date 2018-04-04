@@ -144,7 +144,7 @@ GLCamRenderer::loadBufferData ()
 CVReturn
 GLCamRenderer::renderForTime (CVTimeStamp time)
 {
-    glClearColor(1.0, 1.0, 1.0, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     GL_GET_ERROR();
     
     glUseProgram(shaderProgram);
