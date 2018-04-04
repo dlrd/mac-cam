@@ -11,9 +11,9 @@
 
 #define MAC_CAM_DECLARE_OPAQUE_INTERNALS(Class) \
 public: \
-    ~Class (); \
     struct That; \
      Class (That* that_) : that(that_) {} \
+    ~Class (); \
     That* that;
 
 //------------------------------------------------------------------------------
@@ -56,20 +56,27 @@ struct CameraCapture
     Strings cameraResolutions (String cameraName);
     Strings cameraFramerates  (String cameraName, String cameraResolution);
 
+    struct Delegate
+    {
+        TextureType textureType = TextureType::_422YpCbCr8;
+
+        std::function<void ()        > makeOpenGLContextCurrent = [] ()         { abort(); };
+        std::function<void (FramePtr)> cameraFrameWasCaptured   = [] (FramePtr) { abort(); };
+    };
+
     struct Settings
     {
         String cameraName;
         String cameraPreset;
         String cameraResolution;
         String cameraFramerate;
-
-        TextureType textureType = TextureType::_422YpCbCr8;
-
-        std::function<void ()        > makeOpenGLContextCurrent;
-        std::function<void (FramePtr)> cameraFrameWasCaptured;
     };
 
     CameraCapture ();
+
+    Delegate delegate;
+
+    const Settings& currentSettings ();
 
     void  setup (const Settings& settings);
 

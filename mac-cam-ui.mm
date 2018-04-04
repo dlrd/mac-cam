@@ -21,13 +21,13 @@
 
     CameraCapture::Settings settings;
     
-    settings.cameraFrameWasCaptured = [self] (CameraCapture::FramePtr frame) {
+    self->cameraCapture.delegate.cameraFrameWasCaptured = [self] (CameraCapture::FramePtr frame) {
     
         self.glCamView.cameraFrame = frame;
 
     };
 
-    settings.makeOpenGLContextCurrent = [self] () {
+    self->cameraCapture.delegate.makeOpenGLContextCurrent = [self] () {
     
         [self.glCamView.openGLContext makeCurrentContext];
     

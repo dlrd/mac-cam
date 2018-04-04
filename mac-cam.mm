@@ -75,7 +75,7 @@ struct CameraCapture::Frame::That
         CFRelease(pixelBuffer);
         CFRelease(texture);
     }
-
+    
     CMSampleBufferRef  sampleBuffer;
     CVPixelBufferRef   pixelBuffer;
     CVOpenGLTextureRef texture;
@@ -130,7 +130,7 @@ CameraCapture::Frame::~Frame ()
 
 @interface objc_CameraCapture : NSObject<AVCaptureVideoDataOutputSampleBufferDelegate>
 {
-    @public CameraCapture::Settings settings;
+    @public CameraCapture* cxx;
 }
 
 @property (strong)        AVCaptureSession*         session;
@@ -208,7 +208,7 @@ CameraCapture::Frame::~Frame ()
     [_videoOutput setSampleBufferDelegate:self queue:_cameraOutputQueue];
 
     _videoOutput.videoSettings = @{
-        (NSString*)kCVPixelBufferPixelFormatTypeKey : @(toCVPixelFormatType(settings.textureType)),
+        (NSString*)kCVPixelBufferPixelFormatTypeKey : @(toCVPixelFormatType(cxx->delegate.textureType)),
         (NSString*)kCVPixelBufferOpenGLCompatibilityKey : @YES,
         (NSString*)kCVPixelBufferIOSurfacePropertiesKey : @{},
     };
@@ -373,7 +373,7 @@ CameraCapture::Frame::~Frame ()
     if (kCMMediaType_Video != CMFormatDescriptionGetMediaType(formatDescription))
         return;
 
-    if (toCVPixelFormatType(settings.textureType) != CMFormatDescriptionGetMediaSubType(formatDescription))
+    if (toCVPixelFormatType(cxx->delegate.textureType) != CMFormatDescriptionGetMediaSubType(formatDescription))
         return;
     
     CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
@@ -381,8 +381,8 @@ CameraCapture::Frame::~Frame ()
     if (!pixelBuffer)
         return;
 
-    settings.makeOpenGLContextCurrent();
-    
+    cxx->delegate.makeOpenGLContextCurrent();
+
     if (_videoTextureCache)
     {
         CVOpenGLTextureCacheFlush(_videoTextureCache, 0);
@@ -432,7 +432,7 @@ CameraCapture::Frame::~Frame ()
     
     CFRelease(texture);
 
-    settings.cameraFrameWasCaptured(frame);
+    cxx->delegate.cameraFrameWasCaptured(frame);
 }
 
 - (void)captureOutput:(AVCaptureOutput *)output didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
@@ -446,13 +446,14 @@ CameraCapture::Frame::~Frame ()
 
 struct CameraCapture::That
 {
-    objc_CameraCapture* objc = [[objc_CameraCapture alloc] init];
+    Settings            settings;
+    objc_CameraCapture* objc     = [[objc_CameraCapture alloc] init];
 };
 
 CameraCapture::CameraCapture ()
     : that(new That())
 {
-
+    that->objc->cxx = this;
 }
 
 CameraCapture::~CameraCapture ()
@@ -577,7 +578,7 @@ CameraCapture::setup (const Settings& settings)
     }
 #endif
 
-    that->objc->settings = settings;
+    that->settings = settings;
 
     [that->objc setupCapture];
 }
@@ -603,7 +604,7 @@ objc (CameraCapture* cameraCapture)
 }
 
 //capture.selectedVideoDevice
-//capture.videoDevices>
+//capture.videoDevices
 //capture.videoDevices.localizedName
 //capture.selectedVideoDevice.formats
 //capture.selectedVideoDevice.formats.localizedName
