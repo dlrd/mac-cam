@@ -1,7 +1,7 @@
 #version 150
 
 const bool yFlipped = true;
-const bool xFlipped = false;
+const bool xFlipped = true;
 const bool rainbow = false;
 const float rainbowOpacity = 0.25;
 
