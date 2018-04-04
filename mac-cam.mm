@@ -216,11 +216,10 @@ CameraCapture::Frame::~Frame ()
     [_session addOutput:_videoOutput];
 
     AVCaptureDevice *videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-    if (videoDevice) {
-        [self setSelectedVideoDevice:videoDevice];
-    } else {
-        [self setSelectedVideoDevice:[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeMuxed]];
-    }
+    if (videoDevice)
+        self.selectedVideoDevice = videoDevice;
+    else
+        self.selectedVideoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeMuxed];
 
     // Initial refresh of device list
     [self refreshDevices];
@@ -256,7 +255,7 @@ CameraCapture::Frame::~Frame ()
 
 - (AVCaptureDevice *)selectedVideoDevice
 {
-    return [_videoDeviceInput device];
+    return _videoDeviceInput.device;
 }
 
 - (void)setSelectedVideoDevice:(AVCaptureDevice *)selectedVideoDevice
@@ -279,11 +278,12 @@ CameraCapture::Frame::~Frame ()
                 [self presentError:error];
             });
         } else {
-            if (![selectedVideoDevice supportsAVCaptureSessionPreset:[_session sessionPreset]])
-                [_session setSessionPreset:AVCaptureSessionPresetHigh];
+            if (![selectedVideoDevice supportsAVCaptureSessionPreset:_session.sessionPreset])
+                _session.sessionPreset = AVCaptureSessionPresetHigh;
             
             [_session addInput:newVideoDeviceInput];
-            [self setVideoDeviceInput:newVideoDeviceInput];
+
+            self.videoDeviceInput = newVideoDeviceInput;
         }
     }
     
