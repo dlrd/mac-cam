@@ -17,6 +17,7 @@
 		6F1CE02F2073F99000852EC1 /* test.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 6F1CE0242073F99000852EC1 /* test.vsh */; };
 		6F1CE0302073F99000852EC1 /* cam.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 6F1CE0252073F99000852EC1 /* cam.fsh */; };
 		6F1CE0312073F99000852EC1 /* gl-mac-app.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6F1CE0272073F99000852EC1 /* gl-mac-app.mm */; };
+		6F1CE0342074F71400852EC1 /* mac-cam-ui.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6F1CE0322074F71400852EC1 /* mac-cam-ui.mm */; };
 		6F2F32AD206BDC3C00BA10DA /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F2F32AC206BDC3C00BA10DA /* OpenGL.framework */; };
 		6F2F32B4206BF40500BA10DA /* mac-gl-view.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6F2F32B2206BF40500BA10DA /* mac-gl-view.mm */; };
 		6FADACAC206D37FE00E8B07E /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FADACAB206D37FE00E8B07E /* CoreImage.framework */; };
@@ -45,6 +46,8 @@
 		6F1CE0252073F99000852EC1 /* cam.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = cam.fsh; sourceTree = "<group>"; };
 		6F1CE0262073F99000852EC1 /* gl-app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "gl-app.h"; sourceTree = "<group>"; };
 		6F1CE0272073F99000852EC1 /* gl-mac-app.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "gl-mac-app.mm"; sourceTree = "<group>"; };
+		6F1CE0322074F71400852EC1 /* mac-cam-ui.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "mac-cam-ui.mm"; sourceTree = "<group>"; };
+		6F1CE0332074F71400852EC1 /* mac-cam-ui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mac-cam-ui.h"; sourceTree = "<group>"; };
 		6F2F32AC206BDC3C00BA10DA /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		6F2F32B2206BF40500BA10DA /* mac-gl-view.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "mac-gl-view.mm"; sourceTree = "<group>"; };
 		6F2F32B3206BF40500BA10DA /* mac-gl-view.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mac-gl-view.h"; sourceTree = "<group>"; };
@@ -84,12 +87,12 @@
 		6F1CE0172073F99000852EC1 /* gl-app */ = {
 			isa = PBXGroup;
 			children = (
-				6F1CE0182073F99000852EC1 /* renderers */,
-				6F1CE01F2073F99000852EC1 /* gl-mac-app.h */,
-				6F1CE0202073F99000852EC1 /* gl-app.cpp */,
-				6F1CE0212073F99000852EC1 /* shaders */,
 				6F1CE0262073F99000852EC1 /* gl-app.h */,
+				6F1CE0202073F99000852EC1 /* gl-app.cpp */,
+				6F1CE01F2073F99000852EC1 /* gl-mac-app.h */,
 				6F1CE0272073F99000852EC1 /* gl-mac-app.mm */,
+				6F1CE0182073F99000852EC1 /* renderers */,
+				6F1CE0212073F99000852EC1 /* shaders */,
 			);
 			path = "gl-app";
 			sourceTree = "<group>";
@@ -98,9 +101,9 @@
 			isa = PBXGroup;
 			children = (
 				6F1CE0192073F99000852EC1 /* gl-cam-renderer.h */,
-				6F1CE01A2073F99000852EC1 /* gl-test-renderer.cpp */,
-				6F1CE01B2073F99000852EC1 /* gl-test-renderer.h */,
 				6F1CE01C2073F99000852EC1 /* gl-cam-renderer.mm */,
+				6F1CE01B2073F99000852EC1 /* gl-test-renderer.h */,
+				6F1CE01A2073F99000852EC1 /* gl-test-renderer.cpp */,
 			);
 			path = renderers;
 			sourceTree = "<group>";
@@ -108,9 +111,9 @@
 		6F1CE0212073F99000852EC1 /* shaders */ = {
 			isa = PBXGroup;
 			children = (
+				6F1CE0242073F99000852EC1 /* test.vsh */,
 				6F1CE0222073F99000852EC1 /* test.fsh */,
 				6F1CE0232073F99000852EC1 /* cam.vsh */,
-				6F1CE0242073F99000852EC1 /* test.vsh */,
 				6F1CE0252073F99000852EC1 /* cam.fsh */,
 			);
 			path = shaders;
@@ -124,6 +127,8 @@
 				6F2F32B2206BF40500BA10DA /* mac-gl-view.mm */,
 				E9C967E4137B516200C6D18B /* mac-cam.h */,
 				E9C967E5137B516200C6D18B /* mac-cam.mm */,
+				6F1CE0332074F71400852EC1 /* mac-cam-ui.h */,
+				6F1CE0322074F71400852EC1 /* mac-cam-ui.mm */,
 				E9C967DE137B516200C6D18B /* main.mm */,
 				E9C967E0137B516200C6D18B /* mac-cam-prefix.pch */,
 				E9C967DA137B516200C6D18B /* mac-cam-info.plist */,
@@ -231,6 +236,7 @@
 				6F1CE0312073F99000852EC1 /* gl-mac-app.mm in Sources */,
 				6F1CE02C2073F99000852EC1 /* gl-app.cpp in Sources */,
 				6F2F32B4206BF40500BA10DA /* mac-gl-view.mm in Sources */,
+				6F1CE0342074F71400852EC1 /* mac-cam-ui.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -5,12 +5,16 @@
 #include <memory>
 #include <functional>
 
+//------------------------------------------------------------------------------
+
 #define MAC_CAM_DECLARE_OPAQUE_INTERNALS(Class) \
 public: \
     ~Class (); \
     struct That; \
      Class (That* that_) : that(that_) {} \
     That* that;
+
+//------------------------------------------------------------------------------
 
 struct CameraCapture
 {
@@ -43,7 +47,8 @@ struct CameraCapture
 
     struct Settings
     {
-        TextureType                    cameraTextureType = TextureType::_422YpCbCr8;
+        TextureType cameraTextureType = TextureType::_422YpCbCr8;
+
         std::function<void ()        > makeOpenGLContextCurrent;
         std::function<void (FramePtr)> cameraFrameWasCaptured;
     };
@@ -60,17 +65,6 @@ struct CameraCapture
 
 //------------------------------------------------------------------------------
 
-#import <Cocoa/Cocoa.h>
-#import <AVFoundation/AVFoundation.h>
-
-@class OpenGLCamView;
-
-@interface AVCaptureDocument : NSDocument
-
-@property (readonly) NSObject* capture;
-
-@property (assign) IBOutlet OpenGLCamView *glCamView;
-
-- (IBAction)stop:(id)sender;
-
-@end
+#if __OBJC__
+NSObject* objc (CameraCapture*);
+#endif

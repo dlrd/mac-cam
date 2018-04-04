@@ -45,17 +45,13 @@ compileShaderResource (GLenum type, const char* path)
 GLuint
 compileShaderFile (GLenum type, const char* file)
 {
-    printf("%s\n", file);
-
     GLuint shader;
     std::vector<char> source;
     if (!readBinaryFile(file, source))
     {
         GL_REPORT_FAILURE("Failed to read shader file %s", file);
     }
-
-    printf("%s\n", source.data());
-    
+   
     shader = glCreateShader(type);
 
     GL_GET_ERROR();
@@ -88,8 +84,6 @@ compileShaderFile (GLenum type, const char* file)
         GL_GET_ERROR();
         GL_REPORT_FAILURE("Shader compilation failed for file %s", file);
     }
-
-    printf("%d\n", shader);
 
     return shader;
 }

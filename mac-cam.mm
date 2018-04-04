@@ -1,8 +1,7 @@
 #import "mac-cam.h"
 #import <AVFoundation/AVFoundation.h>
+#import <CoreVideo/CoreVideo.h>
 #import <OpenGL/OpenGL.h>
-#include <CoreVideo/CoreVideo.h>
-#import "mac-gl-view.h"
 
 //------------------------------------------------------------------------------
 
@@ -32,6 +31,8 @@ toCameraTextureType (OSType from)
     }
 }
 
+//------------------------------------------------------------------------------
+
 struct CameraCapture::Frame::That
 {
     That (
@@ -59,6 +60,8 @@ struct CameraCapture::Frame::That
     CVPixelBufferRef   pixelBuffer;
     CVOpenGLTextureRef texture;
 };
+
+//------------------------------------------------------------------------------
 
 int
 CameraCapture::Frame::width ()
@@ -101,28 +104,30 @@ CameraCapture::Frame::~Frame ()
     delete that;
 }
 
+//------------------------------------------------------------------------------
+
 #define CF_ARC __attribute__((NSObject))
 
-@interface objc_CameraCapture : NSObject
-<
-    AVCaptureVideoDataOutputSampleBufferDelegate
->
+@interface objc_CameraCapture : NSObject<AVCaptureVideoDataOutputSampleBufferDelegate>
+{
+    @public CameraCapture::Settings settings;
+}
 
-@property                 CameraCapture::Settings   settings;
 @property (strong)        AVCaptureSession*         session;
-@property (assign)        AVCaptureDevice*          selectedVideoDevice;
-@property (assign)        AVCaptureDeviceFormat*    videoDeviceFormat;
-@property (assign)        AVFrameRateRange*         frameRateRange;
-@property (strong)        AVCaptureDeviceInput*     videoDeviceInput;
 @property (strong)        NSArray*                  observers;
+@property (strong)        AVCaptureDeviceInput*     videoDeviceInput;
 @property (strong)        AVCaptureVideoDataOutput* videoOutput;
 @property (strong) CF_ARC dispatch_queue_t          cameraOutputQueue;
 @property (strong) CF_ARC CVOpenGLTextureCacheRef   videoTextureCache;
-
-@property (strong) NSArray *videoDevices;
-@property (readonly) NSArray *availableSessionPresets;
+@property (strong)        NSArray*                  videoDevices;
+@property (readonly)      NSArray*                  availableSessionPresets;
+@property (assign)        AVCaptureDevice*          selectedVideoDevice;
+@property (assign)        AVCaptureDeviceFormat*    videoDeviceFormat;
+@property (assign)        AVFrameRateRange*         frameRateRange;
 
 @end
+
+//------------------------------------------------------------------------------
 
 @implementation objc_CameraCapture
 
@@ -133,44 +138,49 @@ CameraCapture::Frame::~Frame ()
 
 - (void) setupCapture
 {
-    // Create a capture session
     _session = [[AVCaptureSession alloc] init];
 
-    // Capture Notification Observers
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    id runtimeErrorObserver = [notificationCenter addObserverForName:AVCaptureSessionRuntimeErrorNotification
-                                                              object:_session
-                                                               queue:[NSOperationQueue mainQueue]
-                                                          usingBlock:^(NSNotification *note) {
-                                                              dispatch_async(dispatch_get_main_queue(), ^(void) {
-                                                                  [self presentError:[[note userInfo] objectForKey:AVCaptureSessionErrorKey]];
-                                                              });
-                                                          }];
-    id didStartRunningObserver = [notificationCenter addObserverForName:AVCaptureSessionDidStartRunningNotification
-                                                                 object:_session
-                                                                  queue:[NSOperationQueue mainQueue]
-                                                             usingBlock:^(NSNotification *note) {
-                                                                 NSLog(@"did start running");
-                                                             }];
-    id didStopRunningObserver = [notificationCenter addObserverForName:AVCaptureSessionDidStopRunningNotification
-                                                                object:_session
-                                                                 queue:[NSOperationQueue mainQueue]
-                                                            usingBlock:^(NSNotification *note) {
-                                                                NSLog(@"did stop running");
-                                                            }];
-    id deviceWasConnectedObserver = [notificationCenter addObserverForName:AVCaptureDeviceWasConnectedNotification
-                                                                    object:nil
-                                                                     queue:[NSOperationQueue mainQueue]
-                                                                usingBlock:^(NSNotification *note) {
-                                                                    [self refreshDevices];
-                                                                }];
-    id deviceWasDisconnectedObserver = [notificationCenter addObserverForName:AVCaptureDeviceWasDisconnectedNotification
-                                                                       object:nil
-                                                                        queue:[NSOperationQueue mainQueue]
-                                                                   usingBlock:^(NSNotification *note) {
-                                                                       [self refreshDevices];
-                                                                   }];
-    _observers = [[NSArray alloc] initWithObjects:runtimeErrorObserver, didStartRunningObserver, didStopRunningObserver, deviceWasConnectedObserver, deviceWasDisconnectedObserver, nil];
+
+    _observers = @[
+        [notificationCenter addObserverForName:AVCaptureSessionRuntimeErrorNotification
+            object: _session
+            queue: [NSOperationQueue mainQueue]
+            usingBlock: ^(NSNotification *note) {
+                dispatch_async(dispatch_get_main_queue(), ^(void) {
+                    [self presentError:[[note userInfo] objectForKey:AVCaptureSessionErrorKey]];
+                });
+            }
+        ],
+        [notificationCenter addObserverForName:AVCaptureSessionDidStartRunningNotification
+            object: _session
+            queue: [NSOperationQueue mainQueue]
+            usingBlock: ^(NSNotification *note) {
+                NSLog(@"Capture session started.");
+            }
+        ],
+        [notificationCenter addObserverForName:AVCaptureSessionDidStopRunningNotification
+            object: _session
+            queue: [NSOperationQueue mainQueue]
+            usingBlock: ^(NSNotification *note) {
+                NSLog(@"Capture session stopped.");
+            }
+        ],
+        [notificationCenter addObserverForName:AVCaptureDeviceWasConnectedNotification
+            object:nil
+            queue:[NSOperationQueue mainQueue]
+            usingBlock:^(NSNotification *note) {
+                [self refreshDevices];
+            }
+        ],
+        [notificationCenter addObserverForName:AVCaptureDeviceWasDisconnectedNotification
+            object:nil
+            queue:[NSOperationQueue mainQueue]
+            usingBlock:^(NSNotification *note) {
+                [self refreshDevices];
+            }
+        ]
+    ];
 
     _cameraOutputQueue = dispatch_queue_create("CameraOutputQueue", DISPATCH_QUEUE_SERIAL);
 
@@ -178,7 +188,7 @@ CameraCapture::Frame::~Frame ()
     [_videoOutput setSampleBufferDelegate:self queue:_cameraOutputQueue];
 
     _videoOutput.videoSettings = @{
-        (NSString*)kCVPixelBufferPixelFormatTypeKey : @(toCVPixelFormatType(_settings.cameraTextureType)),
+        (NSString*)kCVPixelBufferPixelFormatTypeKey : @(toCVPixelFormatType(settings.cameraTextureType)),
         (NSString*)kCVPixelBufferOpenGLCompatibilityKey : @YES,
         (NSString*)kCVPixelBufferIOSurfacePropertiesKey : @{},
     };
@@ -355,7 +365,7 @@ CameraCapture::Frame::~Frame ()
     if (kCMMediaType_Video != CMFormatDescriptionGetMediaType(formatDescription))
         return;
 
-    if (toCVPixelFormatType(_settings.cameraTextureType) != CMFormatDescriptionGetMediaSubType(formatDescription))
+    if (toCVPixelFormatType(settings.cameraTextureType) != CMFormatDescriptionGetMediaSubType(formatDescription))
         return;
     
     CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
@@ -363,7 +373,7 @@ CameraCapture::Frame::~Frame ()
     if (!pixelBuffer)
         return;
 
-    self.settings.makeOpenGLContextCurrent();
+    settings.makeOpenGLContextCurrent();
     
     if (_videoTextureCache)
     {
@@ -414,7 +424,7 @@ CameraCapture::Frame::~Frame ()
     
     CFRelease(texture);
 
-    self.settings.cameraFrameWasCaptured(frame);
+    settings.cameraFrameWasCaptured(frame);
 }
 
 - (void)captureOutput:(AVCaptureOutput *)output didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection NS_AVAILABLE(10_7, 6_0);
@@ -423,6 +433,8 @@ CameraCapture::Frame::~Frame ()
 }
 
 @end
+
+//------------------------------------------------------------------------------
 
 struct CameraCapture::That
 {
@@ -443,7 +455,7 @@ CameraCapture::~CameraCapture ()
 void
 CameraCapture::setup (const Settings& settings)
 {
-    that->objc.settings = settings;
+    that->objc->settings = settings;
 
     [that->objc setupCapture];
 }
@@ -462,77 +474,8 @@ CameraCapture::stop ()
 
 //------------------------------------------------------------------------------
 
-@interface AVCaptureDocument ()
-
-@property (strong) AVCaptureVideoPreviewLayer *previewLayer;
-
-@end
-
-@implementation AVCaptureDocument
+NSObject*
+objc (CameraCapture* cameraCapture)
 {
-    CameraCapture cameraCapture;
+    return cameraCapture->that->objc;
 }
-
-- (void)windowControllerDidLoadNib:(NSWindowController*) aController
-{
-    [super windowControllerDidLoadNib:aController];
-
-    CameraCapture::Settings settings;
-    
-    settings.cameraFrameWasCaptured = [self] (CameraCapture::FramePtr frame) {
-    
-        self.glCamView.cameraFrame = frame;
-
-    };
-
-    settings.makeOpenGLContextCurrent = [self] () {
-    
-        [self.glCamView.openGLContext makeCurrentContext];
-    
-    };
-
-    cameraCapture.setup(settings);
-    
-    // Start the session aysnchronously, or GL init may happen too late.
-    dispatch_async(dispatch_get_main_queue(), ^{
-
-        self->cameraCapture.start();
-
-    });
-}
-
-- (void)windowWillClose:(NSNotification *)notification
-{
-    cameraCapture.stop();
-}
-
-- (NSString *)windowNibName
-{
-    return @"window";
-}
-
-- (IBAction)stop:(id)sender
-{
-    cameraCapture.stop();
-}
-
-- (NSObject*) capture
-{
-    return cameraCapture.that->objc;
-}
-
-//- (void)forwardInvocation:(NSInvocation *)anInvocation
-//{
-//    if ([cameraCapture.that->objc respondsToSelector: [anInvocation selector]])
-//        [anInvocation invokeWithTarget:cameraCapture.that->objc];
-//    else
-//        [super forwardInvocation:anInvocation];
-//}
-//
-//- (id)forwardingTargetForSelector:(SEL)sel
-//{
-//    return cameraCapture.that->objc;
-//}
-
-@end
-
