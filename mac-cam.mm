@@ -208,13 +208,13 @@ CameraCapture::Frame::~Frame ()
 @property (strong)        NSOperationQueue*         messageQueue;
 @property (strong) CF_ARC dispatch_queue_t          outputQueue;
 @property (strong)        NSArray*                  observers;
-@property (strong) CF_ARC CVOpenGLTextureCacheRef   videoTextureCache;
-@property (strong)        AVCaptureDeviceInput*     videoDeviceInput;
-@property (strong)        NSArray*                  videoDevices;
-@property (readonly)      NSArray*                  availableSessionPresets;
-@property (assign)        AVCaptureDevice*          selectedVideoDevice;
-@property (assign)        AVCaptureDeviceFormat*    videoDeviceFormat;
-@property (assign)        AVFrameRateRange*         frameRateRange;
+@property (strong) CF_ARC CVOpenGLTextureCacheRef   textureCache;
+@property (strong)        AVCaptureDeviceInput*     deviceInput;
+@property (strong)        NSArray*                  devices;
+@property (readonly)      NSArray*                  presets;
+@property (assign)        AVCaptureDevice*          device;
+@property (assign)        AVCaptureDeviceFormat*    format;
+@property (assign)        AVFrameRateRange*         framerate;
 
 @end
 
@@ -294,6 +294,21 @@ struct CameraCapture::That
         ]
     ];
 
+    for (NSString* keyPath in @[
+        @"devices",
+        @"device",
+//        @"videoDevices.localizedName",
+        @"device.formats",
+//        @"selectedVideoDevice.formats.localizedName",
+        @"format",
+        @"framerate",
+        @"device.activeFormat.videoSupportedFrameRateRanges",
+//        @"selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges.localizedName",
+        @"presets",
+        @"session.sessionPreset",
+    ])
+        [self addObserver:self forKeyPath:keyPath options:(NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld) context:nil];
+
     return self;
 }
 
@@ -330,7 +345,7 @@ struct CameraCapture::That
         device.activeVideoMinFrameDuration = framerate.minFrameDuration;
         device.activeVideoMaxFrameDuration = framerate.maxFrameDuration;
 
-        self.selectedVideoDevice = device;
+        self.device = device;
 
         [device unlockForConfiguration];
     }
@@ -348,19 +363,19 @@ struct CameraCapture::That
     [self.session stopRunning];
 }
 
-- (AVCaptureDevice *)selectedVideoDevice
+- (AVCaptureDevice *)device
 {
-    return _videoDeviceInput.device;
+    return _deviceInput.device;
 }
 
-- (void)setSelectedVideoDevice:(AVCaptureDevice *)selectedVideoDevice
+- (void)setDevice:(AVCaptureDevice *)selectedVideoDevice
 {
     [_session beginConfiguration];
     
-    if (self.videoDeviceInput) {
+    if (self.deviceInput) {
         // Remove the old device input from the session
-        [_session removeInput:self.videoDeviceInput];
-        self.videoDeviceInput = nil;
+        [_session removeInput:self.deviceInput];
+        self.deviceInput = nil;
     }
     
     if (selectedVideoDevice) {
@@ -378,7 +393,7 @@ struct CameraCapture::That
             
             [_session addInput:newVideoDeviceInput];
 
-            self.videoDeviceInput = newVideoDeviceInput;
+            self.deviceInput = newVideoDeviceInput;
         }
     }
     
@@ -387,12 +402,12 @@ struct CameraCapture::That
 
 - (void)refreshDevices
 {
-    self.videoDevices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    self.devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
     
     [_session beginConfiguration];
     
-    if (![self.videoDevices containsObject:self.selectedVideoDevice])
-        self.selectedVideoDevice = nil;
+    if (![self.devices containsObject:self.device])
+        self.device = nil;
     
     [_session commitConfiguration];
 }
@@ -402,15 +417,15 @@ struct CameraCapture::That
     return [NSSet setWithObjects: @"selectedVideoDevice.activeFormat", nil];
 }
 
-- (AVCaptureDeviceFormat *)videoDeviceFormat
+- (AVCaptureDeviceFormat *)format
 {
-    return self.selectedVideoDevice.activeFormat;
+    return self.device.activeFormat;
 }
 
-- (void)setVideoDeviceFormat:(AVCaptureDeviceFormat *)deviceFormat
+- (void)setFormat:(AVCaptureDeviceFormat *)deviceFormat
 {
     NSError *error = nil;
-    AVCaptureDevice *videoDevice = self.selectedVideoDevice;
+    AVCaptureDevice *videoDevice = self.device;
     if ([videoDevice lockForConfiguration:&error]) {
         [videoDevice setActiveFormat:deviceFormat];
         [videoDevice unlockForConfiguration];
@@ -426,12 +441,12 @@ struct CameraCapture::That
     return [NSSet setWithObjects: @"selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges", nil];
 }
 
-- (AVFrameRateRange *)frameRateRange
+- (AVFrameRateRange *)framerate
 {
     AVFrameRateRange *activeFrameRateRange = nil;
-    for (AVFrameRateRange *frameRateRange in self.selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges)
+    for (AVFrameRateRange *frameRateRange in self.device.activeFormat.videoSupportedFrameRateRanges)
     {
-        if (CMTIME_COMPARE_INLINE([frameRateRange minFrameDuration], ==, self.selectedVideoDevice.activeVideoMinFrameDuration))
+        if (CMTIME_COMPARE_INLINE([frameRateRange minFrameDuration], ==, self.device.activeVideoMinFrameDuration))
         {
             activeFrameRateRange = frameRateRange;
             break;
@@ -441,15 +456,15 @@ struct CameraCapture::That
     return activeFrameRateRange;
 }
 
-- (void)setFrameRateRange:(AVFrameRateRange *)frameRateRange
+- (void)setFramerate:(AVFrameRateRange *)frameRateRange
 {
     NSError *error = nil;
-    if ([self.selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges containsObject:frameRateRange])
+    if ([self.device.activeFormat.videoSupportedFrameRateRanges containsObject:frameRateRange])
     {
-        if ([self.selectedVideoDevice lockForConfiguration:&error]) {
-            [self.selectedVideoDevice setActiveVideoMinFrameDuration:frameRateRange.minFrameDuration];
-            [self.selectedVideoDevice setActiveVideoMaxFrameDuration:frameRateRange.maxFrameDuration];
-            [self.selectedVideoDevice unlockForConfiguration];
+        if ([self.device lockForConfiguration:&error]) {
+            [self.device setActiveVideoMinFrameDuration:frameRateRange.minFrameDuration];
+            [self.device setActiveVideoMaxFrameDuration:frameRateRange.maxFrameDuration];
+            [self.device unlockForConfiguration];
         } else {
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 [self presentError:error];
@@ -463,7 +478,7 @@ struct CameraCapture::That
     return [NSSet setWithObjects:@"selectedVideoDevice", nil];
 }
 
-- (NSArray *)availableSessionPresets
+- (NSArray *)presets
 {
     NSMutableArray *availableSessionPresets = [NSMutableArray arrayWithCapacity:allSessionPresets.count];
     for (NSString *sessionPreset in allSessionPresets) {
@@ -474,7 +489,7 @@ struct CameraCapture::That
     return availableSessionPresets;
 }
 
-- (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
+- (void) captureOutput:(AVCaptureOutput*)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection*)connection
 {
     CMFormatDescriptionRef formatDescription = CMSampleBufferGetFormatDescription(sampleBuffer);
 
@@ -491,9 +506,9 @@ struct CameraCapture::That
 
     cxx->delegate.makeOpenGLContextCurrent();
 
-    if (_videoTextureCache)
+    if (_textureCache)
     {
-        CVOpenGLTextureCacheFlush(_videoTextureCache, 0);
+        CVOpenGLTextureCacheFlush(_textureCache, 0);
     }
     else
     {
@@ -503,7 +518,7 @@ struct CameraCapture::That
             CGLGetCurrentContext(),
             CGLGetPixelFormat(CGLGetCurrentContext()),
             NULL,
-            &_videoTextureCache
+            &_textureCache
         );
     
         if (err != noErr)
@@ -518,7 +533,7 @@ struct CameraCapture::That
 
     CVReturn err = CVOpenGLTextureCacheCreateTextureFromImage(
         kCFAllocatorDefault,
-        _videoTextureCache,
+        _textureCache,
         pixelBuffer,
         NULL,
         &texture
@@ -543,9 +558,14 @@ struct CameraCapture::That
     cxx->delegate.cameraFrameWasCaptured(frame);
 }
 
-- (void)captureOutput:(AVCaptureOutput *)output didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
+- (void) captureOutput:(AVCaptureOutput*)output didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection*)connection
 {
 
+}
+
+- (void) observeValueForKeyPath:(NSString*)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id>*)change context:(void*)context
+{
+    NSLog(@"KVO: %@: %@", keyPath, change);
 }
 
 @end
@@ -718,17 +738,3 @@ objc (CameraCapture* cameraCapture)
 {
     return cameraCapture->that->objc;
 }
-
-//capture.selectedVideoDevice
-//capture.videoDevices
-//capture.videoDevices.localizedName
-//capture.selectedVideoDevice.formats
-//capture.selectedVideoDevice.formats.localizedName
-//capture.videoDeviceFormat
-//capture.frameRateRange
-//capture.selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges
-//capture.selectedVideoDevice.activeFormat.videoSupportedFrameRateRanges.localizedName
-//capture.availableSessionPresets
-//capture.session.sessionPreset
-
-
