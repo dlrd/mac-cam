@@ -290,10 +290,10 @@ CameraCapture::Frame::~Frame ()
     [_session commitConfiguration];
 }
 
-+ (NSSet *)keyPathsForValuesAffectingVideoDeviceFormat
-{
-    return [NSSet setWithObjects:@"selectedVideoDevice.activeFormat", nil];
-}
+//+ (NSSet *)keyPathsForValuesAffectingVideoDeviceFormat
+//{
+//    return [NSSet setWithObjects: @"selectedVideoDevice.activeFormat", nil];
+//}
 
 - (AVCaptureDeviceFormat *)videoDeviceFormat
 {
